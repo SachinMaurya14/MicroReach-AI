@@ -1,0 +1,6 @@
+{
+  "name": "MicroReach AI",
+  "description": "Discover relevant micro-influencers, qualify creator profiles, generate personalized collaboration messages and manage outreach with MicroReach AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

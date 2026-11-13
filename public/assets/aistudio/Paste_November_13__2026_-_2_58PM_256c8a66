@@ -1,0 +1,1136 @@
+# MICROREACH AI — SHARED DEMO ACCESS + FUNCTIONAL BACKEND
+## Architecture Upgrade and Core Assignment Workflow Implementation
+
+Act as a Principal Full-Stack Engineer, Backend Architect, Supabase Security Engineer, and AI Automation Developer.
+
+You are working on an EXISTING application named MicroReach AI.
+
+Your responsibility is to convert the current frontend demonstration into a functional, link-restricted, shared-workspace SaaS assignment application.
+
+The application must allow invited evaluators to use the actual core workflow without creating accounts or logging in.
+
+This is not a UI-only task. It must eventually support real creator discovery, database persistence, filtering, profile enrichment, AI message generation, and controlled outreach.
+
+The user does not want to manually write code or execute terminal commands. Inspect the existing application, make the changes, install required dependencies, create configuration files and provide a clear list of required environment values.
+
+Do not claim any integration works until it has actually been verified.
+
+---
+
+# PART 1 — FINAL ACCESS MODEL
+
+## 1. Product access requirements
+
+MicroReach AI must use a single shared workspace accessible through a secret invitation link.
+
+The product owner will privately share that link with the professor/evaluator.
+
+Requirements:
+
+- Public marketing landing page remains publicly viewable.
+- Dashboard access requires a valid invitation link.
+- No application login page.
+- No application sign-up page.
+- No username/password system.
+- No Supabase Auth integration.
+- No per-user accounts.
+- No user registration.
+- All invited visitors access the same shared workspace.
+- All invited visitors see the same shared campaign and creator records.
+
+The invitation link itself is the access credential.
+
+Clearly document that anyone who receives or forwards this link can access the shared workspace.
+
+This is link-based shared access, not individual-user authentication.
+
+## 2. Invitation link mechanism
+
+Create a secure invitation-link flow.
+
+Required server environment secrets:
+
+- `DEMO_ACCESS_TOKEN`
+- `DEMO_SESSION_SECRET`
+
+The owner will configure these through the supported secure environment/secrets interface.
+
+Create this route:
+
+`/demo-access`
+
+Invitation format:
+
+`https://YOUR_DOMAIN/demo-access#token=YOUR_DEMO_ACCESS_TOKEN`
+
+Implement the following flow:
+
+1. The visitor opens the invitation URL.
+2. Frontend reads the token from the URL fragment.
+3. Frontend sends the token to a server-side access-exchange endpoint using HTTPS.
+4. Server verifies it against `DEMO_ACCESS_TOKEN` using a constant-time comparison.
+5. On success, server issues a signed, short-lived session cookie.
+6. Cookie attributes must include:
+   - HttpOnly.
+   - Secure in production.
+   - SameSite=Strict or an equally appropriate restrictive setting.
+   - Appropriate Path.
+   - A maximum lifetime of approximately 12 hours.
+7. Frontend removes the token fragment from the address bar using browser history replacement.
+8. Visitor is redirected to `/dashboard`.
+
+Never store the access token in localStorage or sessionStorage.
+
+Never log the raw invitation token.
+
+Never expose `DEMO_ACCESS_TOKEN` or `DEMO_SESSION_SECRET` through frontend code or VITE environment variables.
+
+Create endpoints:
+
+- `POST /api/demo/access`
+- `GET /api/demo/session`
+- `POST /api/demo/logout`
+
+Protect all application data APIs behind validated demo-session middleware.
+
+If a user directly opens `/dashboard` without a valid demo session:
+
+- Show a professional Access Link Required screen.
+- Do not show a login form.
+- Do not reveal database records.
+- Explain that the evaluator needs the private project invitation link.
+
+The public landing page remains accessible.
+
+The existing homepage CTA buttons may navigate to `/dashboard`; if the visitor has no valid session, the access gate must prevent entry.
+
+Use the existing server runtime. Do not create an unnecessary second application server.
+
+## 3. Session security
+
+- Use a cryptographically secure random access token.
+- Sign short-lived session cookies with a server-only signing secret.
+- Verify token expiry and signature on every protected request.
+- Rotating the invitation token must invalidate old invitation links and should invalidate previously derived sessions.
+- Apply rate limiting to access-exchange requests.
+- Validate request Origin and same-origin behaviour.
+- Protect state-changing requests against CSRF.
+- Use HTTPS in production.
+- Avoid permissive CORS.
+- Do not log cookies, invitation tokens or secret headers.
+
+Do not build a general-purpose public API that accepts arbitrary database operations.
+
+Only expose specific application endpoints with strict input validation.
+
+---
+
+# PART 2 — SUPABASE BACKEND ARCHITECTURE
+
+## 1. Existing Supabase project
+
+Use the already configured Supabase project.
+
+Project name: `microreach.ai`
+
+Region: Oceania (Sydney).
+
+Database: PostgreSQL.
+
+Existing frontend dependencies already include:
+
+`@supabase/supabase-js`
+
+Existing client configuration has been created:
+
+- `src/lib/supabase/env.ts`
+- `src/lib/supabase/client.ts`
+- `src/lib/supabase/diagnostics.ts`
+- `src/types/database.ts`
+- `src/services/supabase/`
+
+Inspect and reuse these modules.
+
+Do not create another Supabase project.
+
+## 2. Existing database tables
+
+Six tables already exist in the public schema:
+
+1. `campaigns`
+2. `influencers`
+3. `campaign_influencers`
+4. `discovery_runs`
+5. `outreach_messages`
+6. `outreach_logs`
+
+Preserve them.
+
+Do not duplicate them.
+
+Inspect their real column definitions before using them.
+
+The current schema includes nullable `owner_id` references to `auth.users` in the campaigns and influencers tables.
+
+Because the application uses one shared workspace with no application user accounts:
+
+- Use a single shared application workspace.
+- Use `NULL` for owner_id on shared demo records.
+- Do not invent user UUIDs.
+- Do not create fake authentication identities.
+- Ensure the backend's data-access logic consistently treats these records as shared-workspace records.
+
+All invited visitors may view and modify the same application data through the restricted backend.
+
+## 3. Database API access model
+
+Do not perform application table writes directly from the browser.
+
+Use a server-side Supabase administrative client.
+
+Required server environment values:
+
+- `SUPABASE_URL`
+- `SUPABASE_SECRET_KEY`
+
+The secret key must start with the current Supabase secret-key format, such as `sb_secret_`.
+
+Create a server-only module, for example:
+
+`server/lib/supabaseAdmin.ts`
+
+Use `@supabase/supabase-js`.
+
+The secret key must:
+
+- Remain exclusively on the server.
+- Never use a `VITE_` prefix.
+- Never appear in browser bundles.
+- Never be returned through API responses.
+- Never be written to documentation.
+- Never be committed to Git.
+- Never be exposed in console logs.
+
+The existing publishable key may remain in frontend configuration, but the browser must not use it to bypass database restrictions.
+
+IMPORTANT SECURITY FACT:
+
+A Supabase secret key bypasses Row Level Security. Therefore, backend authorization must be enforced BEFORE creating or executing privileged database operations.
+
+All privileged routes must validate:
+
+1. Valid invitation session.
+2. Allowed application action.
+3. Request schema and input values.
+4. Rate limits.
+5. Business rules.
+
+Keep RLS enabled on the existing six tables.
+
+Do not add unrestricted `anon` policies.
+
+Do not disable RLS.
+
+Do not create public INSERT, UPDATE or DELETE access.
+
+The existing 24 owner-scoped authenticated policies may remain, but the shared-demo server uses its own controlled access layer. Do not pretend those authenticated-user policies authorize anonymous browser visitors.
+
+## 4. Database migrations
+
+Inspect the existing schema first.
+
+If additional fields or tables are required:
+
+- Create additive SQL migrations.
+- Preserve existing records and relationships.
+- Do not drop existing tables or columns.
+- Do not silently change foreign keys.
+- Do not remove existing policies.
+
+Create a migration file under:
+
+`supabase/migrations/`
+
+Useful possible additions include:
+
+### Creator metadata
+
+- `profile_description`
+- `profile_image_url`
+- `source_retrieved_at`
+- `engagement_sample_size`
+- `engagement_calculated_at`
+- `source_metadata JSONB`
+
+### Discovery metadata
+
+- Search parameters.
+- Result counts.
+- Quota usage.
+- Job progress.
+- Failure details.
+
+### Outreach safety
+
+- Idempotency key.
+- Approval timestamp.
+- Sending attempt state.
+- Duplicate prevention constraints.
+
+### Integration credentials
+
+Only if Gmail OAuth persistence requires them, create a private integration-credentials table.
+
+Any stored OAuth refresh tokens must be encrypted with authenticated encryption such as AES-256-GCM using a server-only encryption key.
+
+Do not store raw OAuth refresh tokens in an ordinary plaintext database column.
+
+Keep RLS enabled and do not grant anonymous access to private integration records.
+
+If the current database requires migrations, create the migration SQL and clearly identify it for the owner's execution in Supabase SQL Editor. Do not claim it has already been applied.
+
+---
+
+# PART 3 — REQUIRED SERVER ARCHITECTURE
+
+Inspect the existing `server.ts` and Google AI Studio's supported Node.js runtime.
+
+Use the existing server entry point.
+
+Do not create a duplicate Express server or unrelated backend application.
+
+Create reusable backend modules.
+
+Suggested organization:
+
+`server/`
+
+- `config/`
+- `middleware/`
+  - demoSession.ts
+  - rateLimit.ts
+  - validateRequest.ts
+  - errorHandler.ts
+- `routes/`
+  - demo.routes.ts
+  - campaign.routes.ts
+  - influencer.routes.ts
+  - discovery.routes.ts
+  - message.routes.ts
+  - outreach.routes.ts
+  - export.routes.ts
+  - integration.routes.ts
+- `services/`
+  - supabase/
+  - youtube/
+  - filtering/
+  - enrichment/
+  - gemini/
+  - gmail/
+  - outreach/
+- `utils/`
+- `server.ts` only if the existing entry point is not reusable.
+
+This is a target organization. Adapt to the existing server structure instead of moving working files unnecessarily.
+
+All protected API routes must require the demo session.
+
+Suggested endpoints:
+
+### Demo access
+
+- `POST /api/demo/access`
+- `GET /api/demo/session`
+- `POST /api/demo/logout`
+
+### Campaigns
+
+- `GET /api/campaigns`
+- `POST /api/campaigns`
+- `PATCH /api/campaigns/:id`
+- `DELETE /api/campaigns/:id` (restricted and confirmation-protected)
+
+### Influencers
+
+- `GET /api/influencers`
+- `GET /api/influencers/:id`
+- `GET /api/influencers/export.csv`
+
+### Discovery
+
+- `POST /api/discovery/youtube`
+- `GET /api/discovery/runs`
+- `GET /api/discovery/runs/:id`
+
+### Messages
+
+- `POST /api/messages/generate-email`
+- `POST /api/messages/generate-instagram-dm`
+- `PATCH /api/messages/:id`
+
+### Outreach
+
+- `POST /api/outreach/simulate`
+- `POST /api/outreach/send`
+- `GET /api/outreach/logs`
+
+### Health
+
+- `GET /api/health`
+
+The health endpoint may expose only non-sensitive configuration statuses.
+
+Never expose secret environment values.
+
+Never provide a general endpoint for arbitrary Supabase SQL.
+
+---
+
+# PART 4 — CORE ASSIGNMENT WORKFLOW
+
+This is the most important part of the application.
+
+The system must support:
+
+Discovery → Data Collection → Filtering → Profile Enrichment → AI Personalization → Review → Sending → Tracking.
+
+The assignment requires at least 50 genuine discovered influencer profiles.
+
+The practical demo should highlight the top five qualified influencers.
+
+Do not replace genuine discovery with a fake static dataset.
+
+## 1. Creator discovery
+
+Primary API:
+
+YouTube Data API v3.
+
+Implement server-side API calls only.
+
+Required server secret:
+
+`YOUTUBE_API_KEY`
+
+The user will create this key from Google Cloud Console after enabling YouTube Data API v3.
+
+Discovery configuration:
+
+- Niche: Beauty & Skincare.
+- Country: India preferred.
+- Minimum followers/subscribers: 5,000.
+- Maximum followers/subscribers: 100,000.
+- Estimated engagement threshold: 2%.
+- Target dataset: at least 50 genuine discovered creator profiles.
+- Highlight the five strongest qualified profiles.
+
+Use meaningful search terms:
+
+- Indian skincare routine.
+- Indian beauty creator.
+- Skincare product reviews India.
+- Beauty tips India.
+- Dermatology skincare content India.
+- Makeup and skincare India.
+
+The search should be configurable and extendable.
+
+Implementation:
+
+1. Search for relevant YouTube channels using official Data API endpoints.
+2. Retrieve channel IDs.
+3. Deduplicate channels by channel ID and profile URL.
+4. Retrieve channel snippets and statistics.
+5. Retrieve public video information from the channel's uploads playlist.
+6. Analyze recent eligible public videos.
+7. Store source URLs and retrieval timestamps.
+8. Record discovery runs and failures.
+9. Respect API pagination and quota limits.
+
+Use bounded concurrency and API caching.
+
+Never run unlimited external API requests.
+
+YouTube search has separate quota costs, so implement quota-aware discovery and stop safely before exhausting the available quota.
+
+If the API key is missing, show:
+
+"YouTube integration requires configuration."
+
+Do not populate the results with fabricated profiles.
+
+## 2. Engagement estimation
+
+Use available public metrics from recent eligible videos.
+
+A transparent estimate can use:
+
+Engagement Rate (%) =
+
+((Average Likes + Average Comments) / Subscriber Count) × 100
+
+Use a documented sample of recent videos, ideally at least five where available.
+
+Record:
+
+- Formula version.
+- Subscriber count used.
+- Number of sampled videos.
+- Average likes.
+- Average comments.
+- Calculation timestamp.
+- Source URL.
+
+Label the metric:
+
+"Estimated Public Engagement"
+
+Do not call it the official YouTube Studio engagement rate.
+
+If subscriber counts are hidden or unavailable, mark the metric unavailable.
+
+Do not invent values.
+
+## 3. Filtering and classification
+
+Implement the complete Beauty & Skincare category first.
+
+Rules:
+
+- Beauty & Skincare content relevance.
+- India preferred.
+- 5K–100K subscribers.
+- Estimated engagement at least 2%.
+- Sufficient public profile information.
+
+Each record must have:
+
+- Qualified.
+- Rejected.
+- Needs Review.
+
+Show the exact rejection reason.
+
+Example reasons:
+
+- Below 5K subscribers.
+- Above 100K subscribers.
+- Estimated engagement below 2%.
+- Niche relevance insufficient.
+- Metrics unavailable.
+- Country information unavailable.
+
+Do not automatically reject someone solely because a country value is not exposed by YouTube.
+
+Maintain a separate availability or review state.
+
+Show the five best qualified creators in the overview.
+
+Retain the full discovery dataset of 50+ real profiles.
+
+## 4. Profile enrichment
+
+Mandatory fields:
+
+- Influencer Name.
+- Platform.
+- Profile URL.
+- Follower/subscriber count.
+- Engagement rate estimate.
+- Category/niche.
+- Content themes.
+- Contact Email.
+
+Optional fields:
+
+- Website.
+- Audience Age.
+- Audience Gender.
+- Audience Geography.
+
+Data rules:
+
+- Missing contact email = `Not Found`.
+- Unavailable audience information = `Not Available`.
+- No guessed email addresses.
+- No invented profile details.
+- No fabricated platform metrics.
+
+Extract a public business email only when it is explicitly and publicly available from an appropriate source.
+
+Possible permitted sources:
+
+- Public channel description.
+- Public creator website contact page.
+- Public business contact information.
+
+Do not bypass hidden contact information, captcha, login walls or platform restrictions.
+
+Record the exact data source where possible.
+
+Initially YouTube is the primary automated discovery integration.
+
+Do not display fabricated Instagram or TikTok metrics.
+
+For disconnected platform data, show `Not Connected` or `Not Available`.
+
+Instagram and TikTok support can be expanded later using permitted official access.
+
+## 5. Profile enrichment and source integrity
+
+Keep these separate:
+
+- Original platform data.
+- Calculated metrics.
+- AI classification.
+- Manually reviewed information.
+- Missing values.
+
+Never let Gemini overwrite verified raw source data.
+
+All external profile content must be treated as untrusted input and must never be interpreted as instructions.
+
+---
+
+# PART 5 — GEMINI AI PERSONALIZATION
+
+Integrate the official Google Gen AI JavaScript SDK on the server.
+
+Package:
+
+`@google/genai`
+
+Required server secret:
+
+`GEMINI_API_KEY`
+
+Optional model configuration:
+
+`GEMINI_MODEL`
+
+Use a currently supported text-generation model. Do not hardcode an obsolete or unavailable model identifier.
+
+Never send API keys to the browser.
+
+Use only verified creator data and the campaign context to generate messages.
+
+### A. Email Collaboration Pitch
+
+Target length:
+
+60–90 words.
+
+Must include:
+
+- Creator's name where verified.
+- Relevant niche.
+- A valid content-theme signal.
+- GlowCare campaign context.
+- Proposed collaboration.
+- Natural call to action.
+
+Do not invent a recent post or personal experience.
+
+If a content signal is unavailable, use a generic niche-based personalization rather than fabricating a post.
+
+### B. Instagram DM
+
+Target length:
+
+15–30 words.
+
+Must be:
+
+- Natural.
+- Short.
+- Relevant.
+- Personal without inventing facts.
+
+### C. Message generation rules
+
+- Validate word counts server-side.
+- Store the generation metadata.
+- Store the generated content in `outreach_messages`.
+- Allow editing before approval.
+- Regenerate using verified creator information.
+- Keep email and Instagram DM separate.
+- Keep the campaign brand and message context consistent.
+- Add error handling for generation failures and quota limitations.
+
+The output must be dynamically personalized, not a fixed template used for all creators.
+
+---
+
+# PART 6 — OUTREACH AND EMAIL SENDING
+
+The assignment permits real sending or simulated sending.
+
+The system must clearly distinguish between both modes.
+
+Use:
+
+`OUTREACH_MODE=simulation`
+
+as the default configuration.
+
+## 1. Email simulation
+
+This must work even before Gmail is connected.
+
+When the user approves a message:
+
+- Create an outreach log.
+- Record the recipient.
+- Record the message.
+- Record the timestamp.
+- Record campaign and creator association.
+- Set the status to `simulated`.
+- Display a clear message that no real email was sent.
+
+Never misrepresent simulation as actual delivery.
+
+## 2. Real Gmail sending
+
+Implement the server-side Gmail integration using Google's official Gmail API and OAuth 2.0.
+
+Do not ask for a Gmail account password.
+
+Use OAuth authorization and least-privilege email sending scopes.
+
+Prepare server-side configuration for:
+
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_REDIRECT_URI`
+- Secure refresh-token storage.
+- `INTEGRATION_ENCRYPTION_KEY`
+
+The owner must authorize the sender Gmail account separately.
+
+This Gmail provider authorization does not create an application login system for visitors.
+
+Implement OAuth state verification and secure token handling.
+
+If Gmail credentials are unavailable:
+
+- Keep simulation mode enabled.
+- Show "Gmail not connected."
+- Do not show fake connected status.
+- Never attempt real sending.
+
+## 3. Live sending protection
+
+When live mode is configured:
+
+- Only allow a Qualified creator.
+- Require a valid, publicly verified contact email.
+- Show the message preview before sending.
+- Require explicit approval.
+- Require explicit final confirmation.
+- Prevent duplicate emails.
+- Use an idempotency key.
+- Maintain sending logs.
+- Handle uncertain delivery states safely.
+- Apply rate limits.
+- Enforce a maximum of five real email sends per campaign per day during the shared assignment demo.
+- Respect opt-out and suppression records.
+- Never automatically send bulk messages.
+
+The system must never retry an uncertain non-idempotent send blindly.
+
+## 4. Instagram workflow
+
+Generate the Instagram DM.
+
+Provide:
+
+- Copy to Clipboard.
+- Manual Sending status.
+- Outreach log entry.
+
+Do not bypass Instagram platform restrictions.
+
+Do not create unsupported automated DM sending.
+
+---
+
+# PART 7 — PUBLIC DEMO DATA AND SHARED WORKSPACE
+
+The application uses one shared workspace.
+
+All visitors with a valid invitation link access the same campaigns and creator data.
+
+This means:
+
+- Discovery results are shared.
+- Campaigns are shared.
+- Qualified creators are shared.
+- Generated messages are shared.
+- Outreach history is shared.
+
+Clearly communicate this in internal documentation.
+
+Protect data-changing operations using the demo-session middleware.
+
+Do not allow a visitor to make arbitrary destructive database changes.
+
+Restrict campaign deletion and creator deletion behind confirmation controls.
+
+Maintain audit logs for important actions.
+
+Add a way for the project owner to rotate the access token when the assignment demonstration is over.
+
+Do not implement per-user data isolation in this phase.
+
+---
+
+# PART 8 — FRONTEND INTEGRATION
+
+The following approved UI must remain intact:
+
+- Public landing page `/`.
+- Overview dashboard `/dashboard`.
+- Influencers page `/dashboard/influencers`.
+
+Do not redesign these screens.
+
+Connect their existing controls to the backend:
+
+### Dashboard
+
+- Campaign dropdown loads real campaign records.
+- KPI cards load actual stored totals.
+- Pipeline reflects actual workflow progress.
+- Creator Pipeline table shows stored creator results.
+- AI Pitch Studio loads saved message previews.
+- Approval actions call outreach APIs.
+- Outreach status updates after simulation or live send.
+
+### Influencers
+
+- Search queries stored creator records.
+- Filters use real stored profile metrics.
+- Qualification status is based on actual filter rules.
+- Sort works against real records.
+- Grid/List views remain functional.
+- Selection controls work.
+- Add to Campaign persists the association.
+- Export CSV exports actual stored creator records.
+- Discovery starts the real YouTube discovery job.
+
+Until an API key or integration has been configured, show a clear setup-required state.
+
+Do not fill real data tables with static records that pretend to come from external APIs.
+
+The existing demonstration UI can remain available as a preview state with clear labels.
+
+---
+
+# PART 9 — REQUIRED ENVIRONMENT VARIABLES
+
+Inspect the existing `.env.local` and preserve its current frontend values.
+
+Current frontend configuration already contains:
+
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+Never use these public variables for private backend secrets.
+
+Prepare these server-side secret values:
+
+## Required for shared demo and Supabase backend
+
+- `SUPABASE_URL`
+- `SUPABASE_SECRET_KEY`
+- `DEMO_ACCESS_TOKEN`
+- `DEMO_SESSION_SECRET`
+
+## Required for real YouTube discovery
+
+- `YOUTUBE_API_KEY`
+
+## Required for real Gemini generation
+
+- `GEMINI_API_KEY`
+- `GEMINI_MODEL` (optional if a safe supported default is used)
+
+## Email integration — required only when enabling live Gmail sending
+
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_REDIRECT_URI`
+- `INTEGRATION_ENCRYPTION_KEY`
+
+Keep:
+
+`OUTREACH_MODE=simulation`
+
+until the sender integration has been fully configured and verified.
+
+Create `.env.example` with names and blank placeholders only.
+
+Use Google AI Studio's secure server-side secret configuration facility when available.
+
+Never place any of the following inside VITE variables:
+
+- Supabase secret key.
+- Demo access token.
+- Session signing secret.
+- YouTube API key.
+- Gemini API key.
+- Google OAuth client secret.
+- Gmail refresh token.
+
+If the environment does not support secure server-side secrets, stop and explain the deployment limitation instead of exposing secrets in browser code.
+
+---
+
+# PART 10 — RATE LIMITING AND PROTECTING THE SHARED DEMO
+
+The shared invite link will be distributed to the professor/evaluator, so all external service operations must be controlled.
+
+Implement:
+
+- Per-IP rate limiting on invitation exchange.
+- Per-session API request limits.
+- Discovery frequency limits.
+- Gemini generation limits.
+- Maximum discovery target of 50 per run.
+- Bounded concurrency.
+- API quota tracking.
+- Maximum five actual emails per campaign per day.
+- Duplicate-send prevention.
+- Request validation.
+- Appropriate timeouts.
+- Retry only where safe.
+- Audit logging.
+
+Never expose raw tokens in logs.
+
+Never expose API keys through health endpoints.
+
+Use meaningful HTTP status codes.
+
+---
+
+# PART 11 — AUTOMATION AND ASYNCHRONOUS JOB DESIGN
+
+Discovery and enrichment can take time.
+
+Implement explicit job states:
+
+- pending
+- running
+- completed
+- failed
+- cancelled
+
+Do not assume an in-memory queue is durable.
+
+Persist job state in `discovery_runs`.
+
+Handle:
+
+- External API timeouts.
+- Rate limits.
+- Partial results.
+- Duplicate creator results.
+- Server restarts.
+- API key missing.
+- Database failures.
+
+Do not silently report successful discovery when zero profiles were retrieved.
+
+Show progress and actual result counts in the UI.
+
+Do not run unlimited background tasks.
+
+---
+
+# PART 12 — UI AND PRODUCT CONTENT RULES
+
+Preserve:
+
+- The approved MicroReach AI brand.
+- Existing purple and violet design system.
+- Current dashboard layouts.
+- Current Influencers discovery layout.
+- All navigation and working frontend interactions.
+
+Do not introduce emojis.
+
+Do not introduce fake influencers.
+
+Do not invent testimonials.
+
+Do not display fake API connection indicators.
+
+Do not generate fabricated engagement values.
+
+Do not show fake email verification.
+
+All non-real demonstration information must visibly say "Illustrative Demo Data."
+
+Actual data returned from APIs must retain source and retrieval timestamp.
+
+---
+
+# PART 13 — IMPLEMENTATION SEQUENCE
+
+Work in the following order.
+
+## Stage 1 — Repository and security audit
+
+Inspect:
+
+- Existing React/Vite application.
+- Existing server.ts.
+- Existing Supabase client.
+- Existing six-table schema types.
+- Existing RLS policies.
+- Existing environment configuration.
+- Existing routes.
+
+Report what currently exists before modifying it.
+
+## Stage 2 — Link-based access
+
+Implement:
+
+- Invitation URL handling.
+- Server-side token verification.
+- Secure session cookies.
+- Protected dashboard routes.
+- Protected API middleware.
+- Session expiration.
+- Access denial state.
+
+Test that a normal visitor cannot fetch protected application records without a valid invitation session.
+
+## Stage 3 — Supabase server integration
+
+Implement:
+
+- Server-side Supabase client.
+- Secure secret key use.
+- Shared workspace operations.
+- Campaign persistence.
+- Influencer persistence.
+- Discovery run persistence.
+- Message persistence.
+- Outreach log persistence.
+
+Do not access private tables directly from browser code.
+
+## Stage 4 — YouTube Discovery
+
+Implement actual channel discovery.
+
+Search for 50 genuine candidates and store available profile metrics.
+
+Deduplicate all results.
+
+## Stage 5 — Qualification and enrichment
+
+Implement beauty/skincare relevance checks, follower filters, public engagement estimates and source-aware email enrichment.
+
+Show qualified and rejected results with reasons.
+
+Highlight the five strongest qualifying creators.
+
+## Stage 6 — Gemini AI
+
+Implement server-side generation and persistence of personalized emails and Instagram DMs.
+
+Validate the word limits.
+
+## Stage 7 — Outreach
+
+Implement simulation mode first.
+
+Prepare Gmail OAuth and live email sending.
+
+Keep live mode disabled until the owner has configured and verified the sender account.
+
+Implement manual Instagram DM copy workflow.
+
+## Stage 8 — Connect UI to backend
+
+Connect the approved dashboard and Influencers pages to actual API responses.
+
+Preserve their appearance.
+
+## Stage 9 — Test security and functionality
+
+Verify:
+
+- Landing page accessible without invitation.
+- Dashboard not accessible without a valid invitation.
+- Dashboard accessible using invitation link.
+- No login/signup screen appears.
+- Session expires as configured.
+- No secret appears in frontend assets or browser network responses.
+- An invalid invitation is rejected.
+- Search and filtering work.
+- YouTube discovery uses real API results.
+- Duplicate creators are handled.
+- Top five qualification is accurate.
+- Gemini messages are generated from verified data.
+- Missing emails remain Not Found.
+- Simulated outreach produces accurate logs.
+- Live email requires owner configuration and approval.
+- CSV contains actual stored records.
+- Unauthorized requests cannot use privileged database routes.
+
+## Stage 10 — Final report
+
+Report:
+
+1. Files created and modified.
+2. Dependencies installed.
+3. Invitation access implementation.
+4. Supabase server connection status.
+5. Database schema changes required.
+6. YouTube discovery implementation status.
+7. Gemini implementation status.
+8. Email sending status.
+9. Environment variables still needed.
+10. Tests actually executed.
+11. Production build status.
+12. Exact instructions for creating the professor's invitation URL.
+
+Do not invent success results.
+
+---
+
+# FINAL ACCEPTANCE CRITERIA
+
+MicroReach AI must ultimately support:
+
+1. Public landing page.
+2. Invitation-link-only dashboard access.
+3. No application login or registration.
+4. One shared campaign workspace.
+5. Supabase-backed persistent storage.
+6. At least 50 genuine discovered YouTube creator profiles.
+7. Five top qualified creators highlighted.
+8. Filtering with clear pass/fail reasons.
+9. Source-aware profile enrichment.
+10. No guessed email addresses.
+11. Gemini-generated personalized email pitches of 60–90 words.
+12. Gemini-generated personalized Instagram DMs of 15–30 words.
+13. Review and edit before outreach.
+14. Simulation or approved real Gmail email sending.
+15. Manual Instagram DM workflow.
+16. Outreach status and logs.
+17. Duplicate-send protection.
+18. CSV export.
+19. Rate limits and secure backend authorization.
+20. A working evaluator demonstration through a privately shared URL.
+
+Do not stop at a static dashboard or mock data.
+
+Do not claim the complete workflow works until real integrations have been configured and tested.
+
+Begin with Stage 1: inspect the existing repository and current server runtime, then implement the secure invitation-link and Supabase backend foundation before connecting live external APIs.

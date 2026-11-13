@@ -1,0 +1,1578 @@
+# PROJECT: MICROREACH AI
+## Build a premium, full-length SaaS marketing website inspired by the visual quality and page structure of SARAL
+
+You are a senior SaaS product designer, UI/UX architect, and expert React frontend engineer.
+
+Your task is to design and implement a complete, responsive, production-quality public homepage for **MicroReach AI**, an AI-powered micro-influencer discovery, qualification, profile enrichment, and outreach platform.
+
+This is the public marketing website visitors see before signing in. It is NOT the internal application dashboard.
+
+The homepage must communicate the product's value, explain its capabilities, demonstrate the workflow, build trust through transparent product information, and encourage visitors to get started.
+
+---
+
+# PART 1 — REFERENCE AND DESIGN DIRECTION
+
+## 1. Reference websites and design assets
+
+Primary visual inspiration:
+
+https://www.getsaral.com/
+
+Reference image:
+
+Use the MicroReach AI reference screenshot uploaded with this prompt as the primary visual guide for our brand, colors, hero composition, product mockups, section styling, and content direction.
+
+Study the SARAL website for its:
+
+- Overall page composition and visual rhythm.
+- Professional SaaS typography.
+- Large, well-spaced hero section.
+- Product feature showcase sections.
+- Alternating image and text layouts.
+- Interactive feature selector.
+- Dark violet audience-specific section.
+- Benefit and strategy sections.
+- Educational/resource sections.
+- Pricing presentation.
+- FAQ accordion.
+- Dark conversion banner and multi-column footer.
+
+Aim for a similarly polished, spacious, premium SaaS experience and a comparable level of visual sophistication.
+
+Important originality rule:
+
+Use SARAL as a design and layout inspiration, not as an asset or content source. Do not reproduce its logo, exact marketing copy, testimonials, proprietary graphics, or product screenshots. Create original MicroReach AI content and original product-interface mockups.
+
+Do not create a generic admin dashboard as the homepage.
+
+Do not make the page look like a crowded collection of cards. Every section must have breathing room, clear hierarchy, and a deliberate visual purpose.
+
+## 2. Product identity
+
+Product name: **MicroReach AI**
+
+Product category: AI-powered Micro-Influencer Outreach Platform.
+
+Brand tagline:
+
+"Discover creators. Build relationships. Reach out with relevance."
+
+Product description:
+
+MicroReach AI helps brands discover relevant micro-influencers, evaluate creators using public profile signals, enrich creator profiles, generate personalized collaboration messages, and manage outreach through a transparent workflow.
+
+Initial demonstration campaign:
+
+- Brand: GlowCare.
+- Campaign: GlowCare India Skincare Influencer Campaign.
+- Category: Beauty & Skincare.
+- Target geography: India preferred.
+
+GlowCare is a fictional demonstration brand, not a real customer or partner.
+
+## 3. Core product capabilities
+
+The website must communicate these six capabilities:
+
+1. Creator Discovery.
+2. Smart Filtering & Classification.
+3. Profile Enrichment.
+4. AI-Personalized Email Pitches.
+5. Instagram DM Generation.
+6. Outreach Review, Sending & Tracking.
+
+The core workflow is:
+
+Discovery → Data Collection → Filtering → Enrichment → AI Personalization → Review → Sending → Tracking.
+
+The initial working project focuses on Beauty & Skincare creators, with the architecture designed to be extendable to other niches.
+
+---
+
+# PART 2 — GLOBAL DESIGN SYSTEM
+
+Use the following exact design tokens as the foundation. Do not randomly introduce unrelated colors.
+
+## 1. Color palette
+
+| Token | Color | Usage |
+|---|---|---|
+| Primary Purple | #5B21B6 | Primary buttons, highlights, active tabs |
+| Purple Hover | #7C3AED | Hover states, links, emphasis |
+| Deep Violet | #1E0B36 | Dark audience section, CTA banner |
+| Soft Lavender | #F5F3FF | Hero background accents, offer sections |
+| Dark Ink | #1F2937 | Headings, primary body text |
+| Pure White | #FFFFFF | Main background, product mockups |
+| Border Gray | #E5E7EB | Borders and dividers |
+| Light Surface | #F9FAFB | Soft card backgrounds |
+| Secondary Gray | #9CA3AF | Secondary text |
+| Passed Green | #10B981 | Passed status text |
+| Passed Background | #D1FAE5 | Passed status background |
+| Failed Red | #EF4444 | Failed status text |
+| Failed Background | #FEE2E2 | Failed status background |
+
+Define these as CSS custom properties in a central design-token file.
+
+## 2. Typography
+
+Use **Inter** as the primary font family:
+
+`Inter, system-ui, sans-serif`
+
+Use a clean modern sans-serif style with strong visual hierarchy, similar in visual character to premium SaaS marketing websites.
+
+Typography specifications:
+
+### Main Hero H1
+- Desktop: 48–60px.
+- Font weight: 800.
+- Line height: approximately 1.15.
+- Letter spacing: -0.025em.
+- Highlight selected key phrases in Primary Purple.
+- Keep the headline readable and balanced.
+
+### Section headings H2
+- Desktop: 36px.
+- Font weight: 700.
+- Letter spacing: -0.02em.
+- Line height: approximately 1.2.
+
+### Card headings
+- 18–20px.
+- Font weight: 600.
+
+### Body content
+- 14–16px.
+- Font weight: 400.
+- Comfortable line height.
+
+### Buttons and navigation
+- 14–16px.
+- Font weight: 600.
+
+Use responsive typography with `clamp()` where appropriate.
+
+Avoid overly small text in dashboard mockups. Product previews must remain legible.
+
+## 3. Global layout
+
+- Maximum content width: 1200px.
+- Center the content container.
+- Desktop side padding: approximately 32px.
+- Mobile side padding: approximately 20px.
+- Standard section spacing: 80–112px on desktop.
+- Use consistent vertical spacing between headings, descriptions, and content.
+- Cards: 12–16px border radius.
+- Pills: fully rounded, approximately 9999px.
+- Use subtle borders and soft shadows.
+- Avoid excessive gradients.
+- Use gradients only as restrained visual accents.
+
+## 4. Overall visual character
+
+The website should feel:
+
+- Premium.
+- Spacious.
+- Clean.
+- Modern.
+- Trustworthy.
+- Product-focused.
+- Professional.
+- Conversion-oriented.
+
+Use white as the dominant background with soft lavender visual accents.
+
+Use dark violet only for selected high-impact sections.
+
+Do not make every section purple.
+
+Do not overuse floating illustrations, oversized icons, decorative shapes, or gradients.
+
+Maintain a consistent visual rhythm from the hero to the footer.
+
+---
+
+# PART 3 — PAGE STRUCTURE
+
+Build one complete long-scrolling homepage at route `/`.
+
+Implement the sections in the following order.
+
+## SECTION 1 — Announcement Bar and Sticky Navigation
+
+### A. Optional announcement strip
+
+Create a slim top announcement strip with a light lavender background.
+
+Example text:
+
+"MicroReach AI — A smarter way to discover, qualify and reach micro-influencers."
+
+Keep it subtle and short.
+
+### B. Main navigation
+
+Height: approximately 80px.
+
+Position: sticky at the top.
+
+Background: `rgba(255, 255, 255, 0.90)`.
+
+Use:
+
+`backdrop-filter: blur(10px)`
+
+Add a subtle bottom border.
+
+Use `z-index: 50`.
+
+Left side:
+
+- Original MicroReach AI logo.
+- Create a minimal custom SVG logo using a purple discovery/radar-inspired geometric mark.
+- Brand name: MicroReach AI.
+- Font weight: 700.
+
+Do not use the SARAL logo or copy another brand's visual identity.
+
+Center navigation:
+
+- Product
+- How It Works
+- Use Cases
+- Resources
+- Pricing
+- FAQ
+
+Right navigation:
+
+- Login
+- Get Started
+
+The Product and Resources navigation items can have functional dropdown menus.
+
+All navigation links must scroll to their respective sections.
+
+The header must remain usable on mobile with a responsive menu.
+
+Get Started should scroll to the main conversion section.
+
+Login should display a clearly labelled sign-in-coming-soon placeholder until authentication is implemented. Do not create fake authentication.
+
+---
+
+## SECTION 2 — Hero Section and Product Preview
+
+This section is the most important visual component of the homepage.
+
+### Layout
+
+Use a centered hero composition inspired by the uploaded MicroReach reference image.
+
+Do not use a generic split layout unless it clearly improves the reference composition.
+
+The hero should have:
+
+- A soft white-to-lavender background.
+- A small category pill.
+- A large centered heading.
+- A short supporting paragraph.
+- Two prominent CTA buttons.
+- Small trust/value statements.
+- A large dashboard product-preview card underneath.
+
+Suggested vertical padding:
+
+`padding: 80px 0 48px`
+
+### Hero content
+
+Eyebrow pill:
+
+"AI-POWERED INFLUENCER OUTREACH PLATFORM"
+
+Main headline:
+
+"Automated Micro-Influencer Discovery & Personalized Outreach"
+
+Highlight these phrases with Primary Purple:
+
+- Micro-Influencer
+- Personalized Outreach
+
+Supporting description:
+
+"Discover relevant creators, evaluate their fit, enrich their profiles, and generate personalized collaboration messages — all through one connected outreach workflow."
+
+Primary CTA:
+
+"Start Free Outreach"
+
+Style:
+- Purple background.
+- White text.
+- Rounded pill.
+- Comfortable horizontal padding.
+- Subtle hover transition.
+
+Secondary CTA:
+
+"Watch Walkthrough"
+
+Style:
+- White background.
+- Border gray.
+- Dark text.
+- Rounded pill.
+- Play icon.
+
+Add a small, subtle custom hand-drawn SVG arrow pointing toward the primary CTA. Keep it refined, not cartoonish.
+
+Under the buttons show three short value statements:
+
+- Source-aware Discovery.
+- Transparent Qualification.
+- Human-approved Outreach.
+
+### Hero product mockup
+
+Create a high-quality product-interface preview using actual React components and CSS, not a flat rasterized image.
+
+Maximum width: approximately 1000px.
+
+Position it centered beneath the hero text.
+
+Use:
+
+- White main interface.
+- Deep violet sidebar `#1E0B36`.
+- Subtle border.
+- Rounded corners.
+- Layered soft shadows.
+- Realistic table spacing.
+- Small but readable UI typography.
+
+Add a small visible label:
+
+"Illustrative Product Preview"
+
+The mockup should resemble an actual influencer discovery and tracking application.
+
+Sidebar items:
+
+- Overview.
+- Campaigns.
+- Discovery.
+- Influencers.
+- Messages.
+- Outreach.
+- Analytics.
+
+Main table title:
+
+"AI Creator Discover & Tracker"
+
+Campaign label:
+
+"GlowCare — India Skincare"
+
+Search/filter controls:
+
+- Category: Beauty & Skincare.
+- Geography: India.
+- Followers: 5K–100K.
+- Engagement: 2% minimum.
+- Search button.
+
+Table columns:
+
+- Creator.
+- Platform.
+- Followers.
+- Engagement.
+- Contact.
+- Qualification.
+- Outreach Status.
+
+Use generic sample identities such as Creator A, Creator B, Creator C, and Creator D.
+
+Use clearly identified illustrative values only.
+
+Add a prominent label that the table contains demonstration data, not actual influencer records.
+
+Qualification status:
+
+- Qualified: green.
+- Review: amber.
+- Failed: red.
+
+Show a compact qualification summary on the right side:
+
+- Niche match.
+- Follower range.
+- Engagement.
+- Content relevance.
+- Contact availability.
+
+Use a circular score visualization only as illustrative demo data, never as a real verified score.
+
+The dashboard preview must be large and visually central, not squeezed into a tiny card.
+
+---
+
+## SECTION 3 — Workflow Components / Capability Strip
+
+Create a horizontally arranged platform capability strip beneath the hero.
+
+Heading:
+
+"One connected workflow for your creator campaigns"
+
+Show compact capability items:
+
+- Creator Discovery.
+- Smart Filtering.
+- AI Personalization.
+- Email Outreach.
+- Profile Data.
+- Outreach Tracking.
+
+Use consistent line icons.
+
+Do not show fake integration partner logos or imply external services are connected when they are not.
+
+The section should be clean, with a light lavender surface and subtle separators.
+
+---
+
+## SECTION 4 — What Can You Do With MicroReach AI?
+
+Create a full-width feature showcase section.
+
+Section heading:
+
+"What can you do with MicroReach AI?"
+
+Supporting text:
+
+"Everything you need to move from creator discovery to personalized outreach and campaign tracking."
+
+### Interactive feature selector
+
+Create six horizontally arranged tabs:
+
+1. Creator Discovery.
+2. Smart Filtering.
+3. Profile Enrichment.
+4. AI Email Pitch.
+5. Instagram DM.
+6. Outreach Tracker.
+
+Each tab must be clickable.
+
+The active tab must have:
+
+- Primary Purple text.
+- Purple underline or bottom border.
+- Soft lavender background.
+- Clear active indicator.
+
+Inactive tabs should use a neutral gray appearance.
+
+When users click a tab, update the feature showcase below it.
+
+Use React state for the active tab.
+
+### Feature showcase layout
+
+Use one large clean white card with a thin border and 12–16px corner radius.
+
+Two-column layout:
+
+Left:
+- Feature title.
+- Concise description.
+- Three specific benefits.
+- Relevant CTA button.
+
+Right:
+- An original product-interface mockup for the selected feature.
+
+Implement all six feature states.
+
+#### Tab 1: Creator Discovery
+
+Title:
+
+"Discover creators who fit your brand"
+
+Description:
+
+"Find relevant micro-influencers from YouTube and other permitted public sources using niche-based discovery."
+
+Show:
+
+- Niche selector.
+- Geography selector.
+- Creator size filter.
+- Search interface.
+- Creator results table.
+
+Mention that the initial discovery target is at least 50 genuine creator profiles for the assignment test run. Actual results depend on API access and available public data.
+
+#### Tab 2: Smart Filtering
+
+Title:
+
+"Qualify creators with transparent criteria"
+
+Description:
+
+"Automatically assess creator fit using public metrics, category relevance, geography and engagement estimates."
+
+Example criteria:
+
+- Beauty & Skincare.
+- India preferred.
+- Followers/subscribers: 5K–100K.
+- Estimated engagement: at least 2%.
+
+Show a qualification table with passed and failed outcomes.
+
+Example rejection reasons:
+
+- Followers below 5K.
+- Followers above 100K.
+- Low estimated engagement.
+- Content not sufficiently relevant.
+- Insufficient public metrics.
+
+Display the reason clearly next to the result.
+
+Engagement metrics must be labelled as public estimates, not official platform analytics.
+
+#### Tab 3: Profile Enrichment
+
+Title:
+
+"Know more than just follower counts"
+
+Description:
+
+"Collect useful profile information and maintain source-aware creator records."
+
+Show fields:
+
+- Influencer Name.
+- Platform.
+- Profile URL.
+- Follower Count.
+- Estimated Engagement Rate.
+- Category/Niche.
+- Content Themes.
+- Contact Email.
+- Website, if available.
+- Audience Age, if available.
+- Audience Gender, if available.
+- Audience Geography, if available.
+
+Important display rules:
+
+- Missing contact email: `Not Found`.
+- Unavailable audience information: `Not Available`.
+- Never display guessed or fabricated contact details.
+
+Show a source and verification status in the mock profile.
+
+#### Tab 4: AI Email Pitch
+
+Title:
+
+"Generate outreach that feels personal"
+
+Description:
+
+"Create tailored collaboration pitches based on verified creator data and campaign context."
+
+Show an email composer preview.
+
+Include:
+
+- Email subject.
+- Recipient.
+- Personalized greeting.
+- Context-aware collaboration pitch.
+- Campaign value proposition.
+- Editable message area.
+
+Email length target:
+
+60–90 words.
+
+Add a word count and a personalization context summary.
+
+#### Tab 5: Instagram DM
+
+Title:
+
+"Start conversations with natural DMs"
+
+Description:
+
+"Generate short, relevant Instagram messages based on the creator's niche and public content themes."
+
+Show an original Instagram-style message preview without copying official brand artwork.
+
+DM length target:
+
+15–30 words.
+
+Show:
+
+- Message preview.
+- Copy message button.
+- Manual sending indicator.
+
+Do not imply that arbitrary Instagram accounts can receive automated messages through an unrestricted API.
+
+Instagram DM sending must be represented as a manual workflow unless an officially permitted integration is configured.
+
+#### Tab 6: Outreach Tracker
+
+Title:
+
+"Keep every outreach action organized"
+
+Description:
+
+"Review approvals, manage sending status, prevent duplicate outreach and track campaign activity."
+
+Show a compact outreach queue:
+
+- Influencer.
+- Email.
+- Campaign.
+- Message status.
+- Approval status.
+- Sending status.
+- Date.
+
+Statuses:
+
+- Draft.
+- Pending Approval.
+- Approved.
+- Sent.
+- Failed.
+- Skipped.
+- Manual DM.
+
+Demonstrate an approval-first flow.
+
+---
+
+## SECTION 5 — Dark Violet Audience-Specific Section
+
+Create a full-width dark section using:
+
+`background: #1E0B36`
+
+Desktop padding: approximately 80–96px vertically.
+
+This should be one of the main visual highlights of the homepage.
+
+Do not fill it with too many cards.
+
+Heading:
+
+"Built for teams that want smarter creator outreach"
+
+Create three audience tabs:
+
+- Brand Founders.
+- Growth Marketers.
+- Agency Leads.
+
+The tabs should be interactive and change the copy and checklist.
+
+Active tab:
+
+- Bright purple `#5B21B6`.
+- White text.
+- Clear selected appearance.
+
+Inactive tabs:
+
+- Slightly transparent white.
+- Muted text.
+
+Below, use a balanced two-column layout.
+
+### Left column
+
+Show three or four benefit rows with circular plus icons:
+
+For Brand Founders:
+
+- Discover relevant creators without manual searching.
+- Evaluate profiles using transparent filters.
+- Create personalized collaboration pitches.
+- Manage every outreach action in one place.
+
+For Growth Marketers:
+
+- Standardize creator qualification.
+- Compare public engagement signals.
+- Review relevant creator information.
+- Keep campaigns organized.
+
+For Agency Leads:
+
+- Manage repeatable discovery workflows.
+- Maintain organized creator records.
+- Review personalized outreach at scale.
+- Track work across campaign stages.
+
+Use white headings and muted lavender text.
+
+### Right column
+
+Create an overlapping white product card with an illustrative filter-results table.
+
+Table columns:
+
+- Creator.
+- Followers.
+- Engagement.
+- Qualification.
+- Rejection/Pass reason.
+
+Use green `#10B981` for Passed and red `#EF4444` for Failed.
+
+Show clear example reasons such as:
+
+- Followers below 5K.
+- Low engagement estimate.
+- Niche relevance passed.
+- Contact unavailable.
+
+All data must be marked illustrative.
+
+The overall composition must look premium, spacious, and carefully balanced.
+
+---
+
+## SECTION 6 — Why Teams Choose MicroReach AI
+
+Use a light background and two-column layout.
+
+Left side:
+
+Large heading:
+
+"Why choose MicroReach AI?"
+
+Supporting copy:
+
+"Better creator outreach starts with relevant data, meaningful qualification and personalized communication."
+
+Right side:
+
+Use four vertically stacked benefit items with subtle lavender circular icons.
+
+### Benefit 1: Built with Filtering Logic
+
+"Evaluate creators using configurable niche, geography, follower and engagement criteria."
+
+### Benefit 2: Transparent Data Quality
+
+"Keep source references, verification states and missing information visible."
+
+### Benefit 3: Human Approval First
+
+"Review and approve personalized email messages before sending."
+
+### Benefit 4: Respectful Platform Workflows
+
+"Use permitted data access and manual Instagram DM workflows where automation is not supported."
+
+Use Lucide icons such as funnel, shield-check, user-check and chart-no-axes-combined.
+
+Keep this section minimal. Avoid oversized cards.
+
+---
+
+## SECTION 7 — How It Works: Complete Outreach Pipeline
+
+Heading:
+
+"From discovery to outreach, all in one workflow"
+
+Supporting text:
+
+"A clear process for finding the right creators and managing collaboration outreach."
+
+Create a horizontal six-step workflow on desktop:
+
+1. Discover
+   - Find relevant creators from public sources.
+
+2. Collect
+   - Retrieve accessible profile details and public metrics.
+
+3. Qualify
+   - Evaluate creators using campaign criteria.
+
+4. Enrich
+   - Collect contact details and content context.
+
+5. Personalize
+   - Generate email pitches and Instagram DMs with AI.
+
+6. Review & Track
+   - Approve outreach and record sending activity.
+
+Use icon circles, connecting arrows, concise labels and supporting text.
+
+On mobile, stack the steps vertically or use a responsive timeline.
+
+Avoid tiny text.
+
+---
+
+## SECTION 8 — Manual Work vs MicroReach AI
+
+Create a visually compelling comparison section.
+
+Heading:
+
+"Replace fragmented workflows with one organized process"
+
+Two balanced columns:
+
+### The Manual Approach
+
+- Search creators across multiple sources.
+- Track information in spreadsheets.
+- Manually evaluate content relevance.
+- Write each collaboration email from scratch.
+- Remember follow-ups independently.
+- Maintain scattered outreach records.
+
+### With MicroReach AI
+
+- Centralized creator discovery.
+- Structured qualification criteria.
+- Source-aware profile enrichment.
+- AI-assisted personalized messaging.
+- Approval-first email workflow.
+- Centralized outreach tracking.
+
+Use a restrained neutral treatment for the manual approach and a lavender/purple emphasis for MicroReach AI.
+
+Do not make unverifiable claims about revenue, response rates or time savings.
+
+---
+
+## SECTION 9 — Use Cases and Niche Focus
+
+Heading:
+
+"Built for focused creator campaigns"
+
+Make Beauty & Skincare the primary highlighted demonstration category.
+
+Use a larger feature card for:
+
+**Beauty & Skincare**
+
+"Discover creators who talk about skincare routines, product reviews, beauty tips and personal care."
+
+Show GlowCare as the fictional sample campaign.
+
+Other category cards may include:
+
+- Fashion.
+- Fitness.
+- Technology.
+- Lifestyle.
+- Gaming.
+
+Present these as possible future campaign categories or expandable use cases, not as proof that all integrations and niche classifiers are currently live.
+
+Use clean iconography and compact descriptions.
+
+---
+
+## SECTION 10 — Soft Lavender Campaign CTA Banner
+
+Create a full-width soft lavender banner.
+
+Background:
+
+`#F5F3FF`
+
+Corner radius: approximately 16px.
+
+Padding: approximately 48–64px.
+
+Heading:
+
+"Ready to build a smarter influencer campaign?"
+
+Supporting text:
+
+"Discover relevant creators, qualify profiles and prepare personalized outreach with MicroReach AI."
+
+Primary CTA:
+
+"Start Free Outreach"
+
+Add a secondary action:
+
+"Explore How It Works"
+
+### Decorative elements
+
+Use a few custom SVG or CSS-generated visual accents:
+
+- Small stars.
+- Subtle crescent shapes.
+- Soft circular floating shapes.
+- A restrained coin-like accent.
+
+Use absolute positioning carefully.
+
+Create a gentle floating animation with a slow duration.
+
+Do not overcrowd the banner.
+
+Respect `prefers-reduced-motion`.
+
+Do not use emojis or arbitrary decorative Unicode symbols.
+
+---
+
+## SECTION 11 — Resources and Learning
+
+Create a clean editorial section to give the landing page a complete SaaS marketing feel.
+
+Heading:
+
+"Resources to help you build better creator campaigns"
+
+Create three resource cards:
+
+1. Micro-Influencer Discovery Guide.
+   - How to identify relevant creators from public sources.
+
+2. Understanding Engagement.
+   - How to interpret public engagement estimates and qualification criteria.
+
+3. Personalized Outreach Guide.
+   - How to write relevant and respectful collaboration messages.
+
+These can be simple content-preview cards with clear descriptions and functional anchor actions.
+
+Do not invent published article dates, readership metrics or endorsements.
+
+---
+
+## SECTION 12 — Pricing Preview
+
+Include Pricing in the navigation.
+
+Create a simple, restrained pricing section or pricing announcement panel.
+
+Heading:
+
+"Straightforward pricing for smarter outreach"
+
+Supporting text:
+
+"MicroReach AI pricing details are being finalized."
+
+CTA:
+
+"Get Early Access Updates"
+
+Do not invent plan prices, discounts, annual contract terms, free trial eligibility or guarantees.
+
+Make this section visually balanced and consistent with the rest of the page.
+
+---
+
+## SECTION 13 — Frequently Asked Questions
+
+Heading:
+
+"Frequently Asked Questions"
+
+Supporting text:
+
+"Everything you need to understand the MicroReach AI workflow."
+
+Build an interactive accordion.
+
+Use a centered container with maximum width around 750px.
+
+Each item:
+
+- Light gray background.
+- Thin border.
+- 12px radius.
+- 20–24px padding.
+- Question on the left.
+- Plus/minus icon on the right.
+- Smooth expansion and collapse.
+
+Include these questions:
+
+1. What is MicroReach AI?
+2. How does influencer discovery work?
+3. What defines a micro-influencer?
+4. Which platforms are supported?
+5. How does creator qualification work?
+6. What happens when an influencer's email cannot be found?
+7. How are AI messages personalized?
+8. Can MicroReach AI automatically send Instagram DMs?
+9. Do users approve emails before sending?
+10. Does the application use real influencer data?
+
+Answers must reflect actual project capabilities and limitations.
+
+Explain that the initial implementation focuses on YouTube public data and Beauty & Skincare discovery.
+
+Clarify that Instagram API access is restricted and DM sending is a manual workflow unless permitted capabilities are configured.
+
+Clarify that unavailable contact emails are marked `Not Found`, never guessed.
+
+---
+
+## SECTION 14 — Final Dark Violet CTA
+
+Use another full-width deep violet section.
+
+Background:
+
+`#1E0B36`
+
+Padding: approximately 80px vertically.
+
+Centered white content.
+
+Main heading:
+
+"Ready to scale your micro-influencer outreach?"
+
+Supporting line:
+
+"Bring discovery, qualification, personalization and outreach tracking into one clear workflow."
+
+Primary button:
+
+"Start Free Outreach"
+
+Secondary button:
+
+"See How It Works"
+
+Use restrained decorative SVG line-work around the CTA.
+
+The buttons should scroll to their appropriate destinations.
+
+---
+
+## SECTION 15 — Multi-Column Footer
+
+Create a polished full-width footer.
+
+Use a clean white or very light lavender background.
+
+Left column:
+
+- Original MicroReach AI logo.
+- Short product description.
+- Optional email subscription UI only if clearly marked as a frontend preview until backend is configured.
+
+Other columns:
+
+### Product
+- Features.
+- Discovery.
+- Personalization.
+- Outreach Tracking.
+
+### Workflow
+- How It Works.
+- Qualification.
+- Profile Enrichment.
+- Campaign Tracking.
+
+### Resources
+- Guides.
+- Documentation.
+- FAQs.
+
+### Company
+- About MicroReach AI.
+- Contact.
+- Careers.
+
+### Legal
+- Privacy Policy.
+- Terms of Service.
+
+Do not invent a real support email address, company address, customer logos or social media handles.
+
+The footer must have consistent spacing and a clean hierarchy.
+
+Add copyright:
+
+"© 2026 MicroReach AI. All rights reserved."
+
+---
+
+# PART 4 — IMPORTANT PRODUCT TRUTH AND CONTENT RULES
+
+Marketing copy must accurately reflect the planned product architecture and actual project requirements.
+
+Do not invent functionality or social proof.
+
+## 1. Influencer discovery
+
+Initial focus:
+
+- Beauty & Skincare.
+- India preferred.
+- 5,000–100,000 followers/subscribers.
+- At least 2% estimated engagement.
+- Target of at least 50 genuine profiles for the assignment test run.
+
+YouTube Data API v3 is the primary automated discovery source.
+
+Instagram data access is restricted and must use permitted methods.
+
+Public-source discovery must respect platform terms and technical restrictions.
+
+## 2. Engagement metrics
+
+For YouTube, engagement may be presented as an estimated public metric using available likes, comments and subscriber counts.
+
+Clearly label it as an estimate.
+
+Never claim it is the official YouTube Studio engagement rate.
+
+## 3. Profile enrichment
+
+Mandatory fields:
+
+- Influencer Name.
+- Platform.
+- Profile URL.
+- Follower/subscriber count.
+- Estimated engagement rate.
+- Niche/category.
+- Content themes.
+- Contact email.
+
+Rules:
+
+- Missing email: `Not Found`.
+- Unavailable audience demographics: `Not Available`.
+- No guessed contact emails.
+- No invented profile details.
+- Maintain data source and verification status.
+
+## 4. AI messages
+
+Email pitch: 60–90 words.
+
+Instagram DM: 15–30 words.
+
+Messages must be personalized from verified creator information and the actual campaign brief.
+
+No invented recent posts or personal details.
+
+## 5. Sending workflow
+
+- Email sending requires user approval.
+- Initially use simulation/test mode.
+- Duplicate outreach must be prevented.
+- Outreach status and errors must be recorded.
+- Instagram DMs are manual unless an officially supported integration is configured.
+
+## 6. Demo content
+
+All sample dashboard numbers, creator records, names and campaign outcomes must visibly carry an "Illustrative Demo Data" label.
+
+Never use fabricated testimonials, fictional customer logos, invented customer success stories, made-up revenue metrics or false platform connection badges.
+
+Never claim that a service is live or connected when it is not.
+
+---
+
+# PART 5 — FRONTEND TECHNOLOGY AND ARCHITECTURE
+
+## 1. Technology choices
+
+Use:
+
+- React.
+- TypeScript.
+- Vite.
+- Existing Tailwind CSS setup if already configured.
+- Lucide React icons if available.
+- CSS custom properties for design tokens.
+- React state for interactions.
+
+Use the existing package manager and lockfile when a project already exists.
+
+Do not install unnecessary dependencies.
+
+Do not add a new backend framework for this frontend-only phase.
+
+## 2. Repository inspection
+
+Before writing code:
+
+1. Inspect the current workspace.
+2. Inspect `package.json`.
+3. Inspect the existing Vite and TypeScript configuration.
+4. Inspect existing CSS and UI dependencies.
+5. Inspect the existing entry point.
+6. Determine whether the workspace is empty or already scaffolded.
+7. Preserve working files and settings.
+
+The earlier folder screenshot was only an illustrative example of Google AI Studio's workspace. It must not be treated as the actual existing MicroReach AI repository.
+
+If the workspace is blank, create a clean React + TypeScript + Vite application using the environment's supported setup.
+
+If a project already exists, adapt its structure instead of replacing it.
+
+## 3. Recommended source directory structure
+
+Use this structure as the intended organization. Adjust it to the actual existing scaffold when necessary.
+
+```text
+MicroReach-AI/
+│
+├── public/
+│   ├── images/
+│   ├── icons/
+│   └── favicon.svg
+│
+├── src/
+│   │
+│   ├── app/
+│   │   └── App.tsx
+│   │
+│   ├── components/
+│   │   │
+│   │   ├── layout/
+│   │   │   ├── AnnouncementBar.tsx
+│   │   │   ├── SiteHeader.tsx
+│   │   │   └── SiteFooter.tsx
+│   │   │
+│   │   ├── ui/
+│   │   │   ├── Button.tsx
+│   │   │   ├── Container.tsx
+│   │   │   ├── SectionHeading.tsx
+│   │   │   ├── Badge.tsx
+│   │   │   ├── IconBadge.tsx
+│   │   │   ├── Tabs.tsx
+│   │   │   ├── Accordion.tsx
+│   │   │   └── Modal.tsx
+│   │   │
+│   │   └── product-previews/
+│   │       ├── CreatorDashboardPreview.tsx
+│   │       ├── DiscoveryTablePreview.tsx
+│   │       ├── EmailPitchPreview.tsx
+│   │       ├── InstagramDMPreview.tsx
+│   │       └── OutreachQueuePreview.tsx
+│   │
+│   ├── sections/
+│   │   ├── HeroSection.tsx
+│   │   ├── CapabilityStrip.tsx
+│   │   ├── FeatureShowcaseSection.tsx
+│   │   ├── AudienceSection.tsx
+│   │   ├── WhyMicroReachSection.tsx
+│   │   ├── WorkflowSection.tsx
+│   │   ├── ComparisonSection.tsx
+│   │   ├── UseCasesSection.tsx
+│   │   ├── CampaignBanner.tsx
+│   │   ├── ResourcesSection.tsx
+│   │   ├── PricingPreviewSection.tsx
+│   │   ├── FAQSection.tsx
+│   │   └── FinalCTASection.tsx
+│   │
+│   ├── data/
+│   │   └── landingContent.ts
+│   │
+│   ├── hooks/
+│   │   └── useActiveSection.ts
+│   │
+│   ├── styles/
+│   │   ├── tokens.css
+│   │   ├── globals.css
+│   │   └── landing.css
+│   │
+│   ├── types/
+│   │   └── landing.ts
+│   │
+│   ├── utils/
+│   │   └── scrollToSection.ts
+│   │
+│   └── main.tsx
+│
+├── docs/
+│   └── landing-page-architecture.md
+│
+├── tests/
+│   └── landing-page/
+│
+├── index.html
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+├── .gitignore
+└── README.md
+```
+
+Do not create empty placeholder files unnecessarily.
+
+Do not create one giant component containing the entire landing page.
+
+Keep sections, shared UI components, data and styles modular.
+
+Do not create duplicate components for the same functionality.
+
+## 4. `.aistudio` directory restriction
+
+Do not manually create `.aistudio/` or `aistudio/` as an application source directory.
+
+Never put application components, business logic, assets or production code in these directories.
+
+Keep all application source code in `src/`.
+
+If Google AI Studio automatically creates an internal workspace directory, treat it as platform-managed infrastructure rather than application source. Do not modify or delete platform-managed files blindly.
+
+Ensure internal tooling files are not copied into public application assets, production build output or deployment artifacts.
+
+Do not expose internal workspace metadata through public routes.
+
+Do not break the AI Studio environment while configuring repository exclusions.
+
+## 5. Environment and backend restrictions
+
+This phase is frontend-focused.
+
+Do not:
+
+- Create Supabase database tables.
+- Connect a Supabase project.
+- Create database migrations.
+- Configure Supabase Auth.
+- Call the YouTube API.
+- Call Gemini for live generation.
+- Configure Gmail OAuth.
+- Send real emails.
+- Automate Instagram DMs.
+- Generate fake influencer datasets.
+
+Supabase, YouTube, Gemini and Gmail integrations will be implemented in later phases.
+
+Do not create credentials or API keys.
+
+---
+
+# PART 6 — INTERACTION REQUIREMENTS
+
+The landing page must have functional frontend interactions.
+
+Implement:
+
+1. Sticky navigation.
+2. Smooth anchor scrolling.
+3. Mobile navigation menu.
+4. Product dropdown navigation.
+5. Resources dropdown navigation.
+6. Six interactive feature tabs.
+7. Three interactive audience tabs.
+8. Expandable FAQ accordion.
+9. Watch Walkthrough modal with a clearly labelled placeholder until an actual video is supplied.
+10. Get Started button scrolling to the conversion section.
+11. Login button showing a sign-in-coming-soon state.
+12. Responsive hover and focus states.
+13. A back-to-top control if it improves the long-page experience.
+
+Use React state and reusable components.
+
+All interactive controls must have a real, understandable action.
+
+Avoid dead buttons and fake navigation.
+
+Do not pretend that an early-access form has stored data unless a backend is connected.
+
+---
+
+# PART 7 — RESPONSIVE DESIGN
+
+Desktop is the primary reference, but the design must work on every common screen size.
+
+### Large desktop: 1440px and above
+- Centered content.
+- Maximum width of 1200px.
+- Full navigation.
+- Two-column product showcases.
+- Full-width dark audience section.
+- Horizontal workflow.
+
+### Standard desktop: 1024–1439px
+- Maintain balanced content width.
+- Reduce section padding where appropriate.
+- Preserve readable product mockups.
+- Prevent text and dashboard overlap.
+
+### Tablet: 768–1023px
+- Adapt two-column layouts.
+- Allow workflow steps to wrap.
+- Maintain readable headings.
+- Keep navigation usable.
+
+### Mobile: below 768px
+- Mobile navigation.
+- Stack hero content.
+- Scale dashboard previews carefully.
+- Convert horizontal feature tabs into a horizontally scrollable tab row or suitable stacked controls.
+- Stack all alternating feature sections.
+- Stack the audience comparison.
+- Convert the workflow into a vertical timeline.
+- Ensure CTA buttons are easy to tap.
+- Avoid horizontal page overflow.
+
+All text, product preview elements, tables and controls must remain legible.
+
+---
+
+# PART 8 — ACCESSIBILITY, PERFORMANCE AND CODE QUALITY
+
+- Use semantic HTML landmarks.
+- Use appropriate heading hierarchy.
+- Provide accessible names to icon-only buttons.
+- Use keyboard-accessible tabs and accordions.
+- Use visible focus states.
+- Maintain good color contrast.
+- Respect reduced-motion preferences.
+- Optimize SVG and image usage.
+- Avoid unnecessarily large images.
+- Lazy-load non-critical images when relevant.
+- Avoid layout shifts.
+- Use reusable components.
+- Use strict TypeScript types.
+- Keep business data separate from UI components.
+- Add comments only where they explain meaningful decisions.
+- Do not use emoji anywhere in the application, code, comments, README or documentation.
+
+Do not use unnecessary animation or motion to compensate for weak layout.
+
+---
+
+# PART 9 — SEO AND PUBLIC WEBSITE QUALITY
+
+Set:
+
+Page title:
+
+"MicroReach AI | Micro-Influencer Discovery & Personalized Outreach"
+
+Meta description:
+
+"Discover relevant micro-influencers, qualify creator profiles, generate personalized collaboration messages and manage outreach with MicroReach AI."
+
+Include:
+
+- Semantic page sections.
+- Descriptive navigation labels.
+- Appropriate heading structure.
+- Favicon using the original MicroReach logo.
+- Responsive viewport configuration.
+- Social sharing metadata where appropriate.
+
+Do not invent company addresses or contact details.
+
+---
+
+# PART 10 — IMPLEMENTATION PROCESS AND ACCEPTANCE CRITERIA
+
+Work in the following sequence.
+
+### Step 1 — Inspect
+Inspect the workspace, available tools, dependencies, build scripts and existing files.
+
+### Step 2 — Establish the design system
+Implement the color tokens, Inter typography, reusable spacing, button styles, container and card styles.
+
+### Step 3 — Build the global layout
+Implement announcement bar, sticky navbar, footer and responsive container.
+
+### Step 4 — Implement the hero
+Build the central hero, original logo treatment, CTA buttons and large creator discovery preview.
+
+### Step 5 — Implement all content sections
+Build the interactive feature switcher, role-based dark section, benefits, workflow, manual-vs-automated comparison, use cases, resources, pricing preview, FAQ and final CTA.
+
+### Step 6 — Implement interactions
+Make tabs, accordions, menus, modal and anchor navigation work.
+
+### Step 7 — Responsive review
+Check desktop, tablet and mobile layouts.
+
+### Step 8 — Verify
+Run the available:
+- TypeScript checks.
+- Lint checks.
+- Production build.
+
+Fix relevant errors introduced by your changes.
+
+### Step 9 — Report
+
+Provide a concise implementation report containing:
+
+- Files created.
+- Files modified.
+- Components implemented.
+- Sections implemented.
+- Interactions tested.
+- Responsive checks completed.
+- Build and lint results.
+- Features intentionally left for later integration.
+
+## Final acceptance criteria
+
+The task is complete only when:
+
+- The homepage is a complete, long-scrolling marketing website.
+- The design visibly follows the uploaded MicroReach AI reference.
+- It has the refined, spacious visual quality of a premium SaaS marketing website.
+- The hero and product preview are visually compelling.
+- All six feature tabs work.
+- All three audience tabs work.
+- FAQ accordion works.
+- Navigation and CTAs work.
+- The dark violet section looks polished.
+- The page is responsive.
+- No fake testimonials or customer logos appear.
+- All demo information is clearly labelled.
+- No emojis appear anywhere.
+- The application source is organized and maintainable.
+- The project builds successfully.
+
+IMPORTANT: Do not stop after creating the hero section or a basic dashboard. Complete the entire public marketing homepage from the announcement bar through the footer.
+
+Prioritize visual quality, whitespace, typography, clear messaging and consistent design over simply adding more sections.
+
+Build the actual working React application and show the live preview.

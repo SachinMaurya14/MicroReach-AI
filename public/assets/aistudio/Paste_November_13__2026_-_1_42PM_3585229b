@@ -1,0 +1,1734 @@
+# MICROREACH AI — PHASE 3
+# INTERNAL DASHBOARD AND INFLUENCER DISCOVERY UI IMPLEMENTATION
+
+You are a senior SaaS product architect, senior React engineer, and expert UI/UX designer.
+
+Your task is to extend the existing MicroReach AI application by implementing two complete, responsive application pages:
+
+1. Main Dashboard.
+2. Influencers / Creator Discovery.
+
+The existing public marketing website is already implemented, reviewed, and approved. It must remain intact.
+
+The application is transitioning from a public marketing website into a complete SaaS product interface.
+
+This phase is exclusively for frontend UI and local demonstration interactions. Do not implement authentication or backend integrations yet.
+
+---
+
+# PART 1 — TWO APPROVED VISUAL REFERENCES
+
+Two reference screenshots have been supplied.
+
+Treat each reference as the design source of truth for its corresponding page.
+
+## Reference A — Main Dashboard
+
+The screenshot showing:
+
+- Dark violet left navigation.
+- Workspace and campaign top navigation.
+- Discovered, Qualified, Emails Enriched and Outreach Sent KPI cards.
+- Current Campaign Pipeline Status.
+- Creator Pipeline & Verification table.
+- Right-side AI Pitch Studio drawer.
+- Email Pitch and Instagram DM previews.
+- Approve & Queue Outreach button.
+
+This is the approved design for `/dashboard`.
+
+Preserve its three-pane layout, spacing, content density, border treatment, table design and AI Pitch Studio placement.
+
+## Reference B — Influencers / Creator Discovery
+
+The screenshot showing:
+
+- White left application sidebar.
+- Search, Summary and Facebook Creator Search top tabs.
+- A separate middle filter panel.
+- Creator discovery search toolbar.
+- Five-column creator card grid.
+- Creator selection checkboxes.
+- Niche tags.
+- Six content thumbnails inside each creator card.
+- Instagram, TikTok and YouTube follower metrics.
+- List and Grid view.
+- Add to List and Add to Campaign controls.
+- Find Influencers and Export CSV actions.
+
+This is the approved design for `/dashboard/influencers`.
+
+Preserve its three-pane layout, white surfaces, soft lavender backgrounds, filter hierarchy and creator-card composition.
+
+IMPORTANT:
+
+Do not merge these two pages into one screen.
+
+Do not replace the approved designs with the older generic dashboard concept.
+
+The Dashboard and Influencers pages have different content structures and different page-specific layout styling, as shown in the references.
+
+---
+
+# PART 2 — FINAL PRODUCT AND ROUTING DECISIONS
+
+## Product identity
+
+Product name: MicroReach AI.
+
+Product category: AI-powered Micro-Influencer Outreach Platform.
+
+Initial demonstration campaign:
+
+- Brand: GlowCare.
+- Campaign: GlowCare India Skincare Campaign.
+- Niche: Beauty & Skincare.
+- Target geography: India preferred.
+
+GlowCare is a fictional demonstration brand.
+
+Use this business context consistently. Do not replace the project's initial Beauty & Skincare focus with an unrelated fashion campaign.
+
+## Required routes
+
+Implement these frontend routes:
+
+| Route | Page |
+|---|---|
+| `/` | Existing public landing page |
+| `/dashboard` | Main Dashboard |
+| `/dashboard/influencers` | Influencers / Creator Discovery |
+
+Use the existing routing architecture if one is already present.
+
+If routing is not implemented, introduce an appropriate lightweight React routing solution without rebuilding the application.
+
+## Login and Get Started behaviour — IMPORTANT
+
+For this development phase, authentication is intentionally disabled.
+
+When a visitor clicks any of the following buttons on the public landing page:
+
+- Login.
+- Get Started.
+- Start Free Outreach.
+
+Navigate directly to:
+
+`/dashboard`
+
+DO NOT show a login form.
+
+DO NOT show a sign-up form.
+
+DO NOT request a password.
+
+DO NOT create fake authentication or fake login success.
+
+DO NOT show an authentication error.
+
+The dashboard must be directly accessible through its route.
+
+The navigation can later be replaced with real authentication after Supabase is integrated.
+
+## Internal navigation
+
+When the user is on `/dashboard`:
+
+- Clicking Dashboard opens `/dashboard`.
+- Clicking Influencers opens `/dashboard/influencers`.
+
+When the user is on `/dashboard/influencers`:
+
+- Clicking Dashboard opens `/dashboard`.
+- Clicking Influencers keeps the user on `/dashboard/influencers`.
+
+The Back to Landing Page link must navigate to `/`.
+
+For menu items whose complete pages are not yet implemented, show a clean, clearly labelled "Coming Soon" page or state. Do not create broken links or pretend those modules are operational.
+
+---
+
+# PART 3 — SHARED DESIGN SYSTEM
+
+Use these approved dashboard design tokens.
+
+## A. Dashboard color palette
+
+| Element | Color |
+|---|---|
+| Left Sidebar Background | #1B0D33 |
+| Sidebar Active Item Background | #2E1A4E |
+| Main Workspace Canvas | #F8F9FC |
+| Card & Header Surface | #FFFFFF |
+| Primary Brand Purple | #5B21B6 |
+| Soft Lavender Fill | #EDE9FE |
+| Primary Ink / Headings | #111827 |
+| Secondary Text | #6B7280 |
+| Card & Input Borders | #E5E7EB |
+| Passed Status Text | #059669 |
+| Passed Status Background | #D1FAE5 |
+| Failed Status Text | #DC2626 |
+| Failed Status Background | #FEE2E2 |
+
+## B. Influencers page color palette
+
+| Element | Color |
+|---|---|
+| Sidebar and Filter Surface | #FFFFFF |
+| Main Discovery Canvas | #F7F7FA |
+| Primary Purple | #5B21B6 |
+| Purple Gradient End | #6D28D9 |
+| Active Fill / Filter Chips | #EDE9FE |
+| Primary Text | #111827 |
+| Secondary Text | #4B5563 |
+| Muted Text | #9CA3AF |
+| Card and Input Border | #E5E7EB |
+| Input Border | #D1D5DB |
+
+## C. Typography
+
+Use:
+
+`Inter, system-ui, sans-serif`
+
+Typography must remain consistent with the approved public website.
+
+- Page titles: 26–32px, weight 700.
+- Section headings: 18–20px, weight 600.
+- Card headings: 14–16px, weight 600.
+- Primary metric values: 28–32px, weight 700.
+- Body text: 13–14px.
+- Metadata and labels: 11–12px.
+- Buttons: 13–14px, weight 600.
+
+Use clear text contrast.
+
+Do not make data tables difficult to read.
+
+## D. Component styling
+
+Global cards:
+
+- Background: white.
+- Border: 1px solid #E5E7EB.
+- Border radius: 12px.
+- Shadow: `0 2px 8px rgba(17, 24, 39, 0.04)`.
+
+Inputs:
+
+- Height: approximately 38px.
+- Border: 1px solid #D1D5DB.
+- Border radius: 8px.
+
+Primary buttons:
+
+- Purple: #5B21B6.
+- White text.
+- Consistent hover state.
+- Clear keyboard focus state.
+
+Status badges:
+
+- Passed: green text with pale green background.
+- Failed: red text with pale red background.
+- Pending: neutral or lavender treatment.
+- Review: restrained amber treatment.
+
+Use Lucide React icons where available.
+
+Never use emoji characters anywhere in UI, code, comments, documentation or messages.
+
+---
+
+# PART 4 — SHARED APPLICATION NAVIGATION
+
+Implement the application sidebar with these navigation items in this order:
+
+1. Dashboard.
+2. Influencers.
+3. Campaigns.
+4. Content.
+5. Incentives.
+6. Messages.
+7. Reports.
+8. Tasks.
+9. Settings.
+10. Administration.
+11. Help.
+
+The Tasks item must display a small count badge with `7` as illustrative UI data.
+
+At the bottom of the sidebar:
+
+- Workspace switcher with an outlined square containing `L`.
+- Workspace name: Later.
+- Expand/collapse chevrons.
+- Back to Landing Page link.
+
+These are visual workspace UI labels only. Do not imply that a real third-party workspace integration is connected.
+
+Use page-specific sidebar styles:
+
+- Dashboard: dark violet sidebar.
+- Influencers: white sidebar with lavender active item.
+
+Keep navigation labels and icon meanings consistent between the pages.
+
+Use a reusable sidebar component with an appropriate appearance variant wherever practical.
+
+---
+
+# PART 5 — PAGE ONE: MAIN DASHBOARD
+
+Route:
+
+`/dashboard`
+
+This must be the first page shown when a visitor clicks Login, Get Started or Start Free Outreach on the public landing page.
+
+## A. Overall desktop layout
+
+Reference viewport: 1440 × 810 pixels.
+
+Implement a full-height application workspace.
+
+Use the following desktop layout:
+
+- Left sidebar: 240px.
+- Top header height: 64px.
+- Main workspace: flexible width.
+- AI Pitch Studio right drawer: 300px.
+- Center workspace target: `calc(100% - 540px)`.
+
+Conceptually:
+
+`240px sidebar + flexible central workspace + 300px AI Pitch Studio`
+
+The page should use fixed navigation areas and scrollable content panels.
+
+Do not let the entire page become a vertically scrolling marketing layout.
+
+The center workspace and right drawer must have appropriate independent overflow behavior.
+
+## B. Left sidebar — Dashboard
+
+Width: 240px.
+
+Height: 100vh.
+
+Background: #1B0D33.
+
+Brand area:
+
+- Original MicroReach AI geometric cube/radar logo.
+- White MicroReach AI wordmark.
+- Logo area padding around 20px.
+
+Primary navigation:
+
+- Dashboard.
+- Influencers.
+- Campaigns.
+- Content.
+- Incentives.
+- Messages.
+- Reports.
+- Tasks with badge 7.
+
+Each navigation item:
+
+- Approximately 40px height.
+- Horizontal padding 12px.
+- Gap between icon and text.
+- 8px border radius.
+- Approximately 14px text.
+
+Dashboard is the active item on `/dashboard`.
+
+Active styling:
+
+- Background: #2E1A4E.
+- White text.
+- Clear icon contrast.
+
+Inactive styling:
+
+- Muted lavender/gray text and icons.
+- Subtle hover background.
+
+Add a divider after Tasks.
+
+Secondary navigation:
+
+- Settings.
+- Administration.
+- Help.
+
+Keep these toward the lower half of the sidebar.
+
+Bottom area:
+
+- Workspace switcher card.
+- Letter L inside a purple outlined square.
+- Workspace label: Later.
+- Chevrons.
+- Back to Landing Page link.
+
+The Back to Landing Page action must work.
+
+## C. Dashboard top header
+
+Position:
+
+- Starts immediately to the right of the sidebar.
+- Height: 64px.
+- Background: white.
+- Bottom border: #E5E7EB.
+- Horizontal padding: 24px.
+
+Left:
+
+Breadcrumb:
+
+`Workspace > GlowCare India Skincare`
+
+Center/right controls:
+
+1. Global Search.
+   - Width: approximately 260px.
+   - Height: 38px.
+   - Search icon.
+   - Placeholder: "Global Search".
+
+2. Campaign Dropdown.
+   - Label: "GlowCare — Skincare".
+   - Chevron.
+   - White background.
+   - Light border.
+
+3. New Campaign button.
+   - Text: "+ New Campaign".
+   - Primary purple.
+   - 38–42px height.
+
+4. Help/FAQ button.
+   - Question icon.
+   - Text: Help/FAQ.
+   - Small notification dot may be shown as illustrative UI.
+
+5. User avatar.
+   - Circular avatar or initials.
+   - No real user identity is required.
+
+Global search and campaign controls should have local frontend interactions.
+
+New Campaign may open a local demonstration modal with non-persistent form fields. Make clear that campaign persistence will be added later.
+
+## D. KPI cards
+
+Create a grid of four cards.
+
+Grid:
+
+`grid-template-columns: repeat(4, minmax(0, 1fr))`
+
+Gap: 16px.
+
+Approximate card height: 96–110px.
+
+Cards:
+
+### Card 1
+Label: Discovered
+
+Illustrative value: 54
+
+Icon: Users/Search.
+
+### Card 2
+Label: Qualified
+
+Illustrative value: 32
+
+Icon: Filter.
+
+### Card 3
+Label: Emails Enriched
+
+Illustrative value: 26
+
+Icon: User Check.
+
+### Card 4
+Label: Outreach Sent
+
+Illustrative value: 18
+
+Icon: Send.
+
+Style:
+
+- White background.
+- Thin gray border.
+- 12px radius.
+- Small purple circular icon background.
+- Main value approximately 28px bold.
+- Muted label.
+- Comfortable spacing.
+
+Place a visible label near the KPI area:
+
+"Illustrative Demo Data — backend not connected"
+
+The displayed numbers must not be presented as actual performance results.
+
+## E. Current Campaign Pipeline Status
+
+Position beneath KPI cards.
+
+Card title:
+
+"Current Campaign Pipeline Status"
+
+Use a single horizontal five-stage pipeline:
+
+1. Discovery.
+2. Filtering.
+3. Enrichment.
+4. AI Pitches.
+5. Outreach Log.
+
+Each node:
+
+- Height: 36px.
+- Pill shape.
+- Centered text.
+- Clearly distinguish completed, active and pending states.
+
+Connector styling:
+
+- Completed connector: solid #5B21B6.
+- Active/in-progress connector: dashed #5B21B6.
+- Pending connector: #D1D5DB.
+
+Use simple arrows or CSS connectors.
+
+Use the current demo state to show Discovery and Filtering completed, Enrichment in progress, and later stages pending.
+
+This is a visual workflow preview only.
+
+## F. Creator Pipeline & Verification Table
+
+Create a large white card below the campaign pipeline.
+
+Title:
+
+"Creator Pipeline & Verification"
+
+Use a structured table with a horizontal scroll container if necessary.
+
+Table columns:
+
+1. Checkbox.
+2. Creator.
+3. Platform.
+4. Followers.
+5. Engagement.
+6. Qual. Status.
+7. Email/Contact.
+8. Actions.
+
+Creator cell:
+
+- Circular avatar.
+- Creator name.
+- Social handle in a small colored pill.
+
+Use generic fictional/demo identities:
+
+- Creator A.
+- Creator B.
+- Creator C.
+- Creator D.
+
+Do not present these as actual discovered profiles.
+
+Example illustrative values:
+
+| Creator | Followers | Engagement | Status | Email |
+|---|---:|---:|---|---|
+| Creator A | 54K | 3.8% | Passed | creator-a@example.com |
+| Creator B | 12K | 1.1% | Failed | creator-b@example.com |
+| Creator C | 89K | 4.2% | Passed | creator-c@example.com |
+| Creator D | 7.5K | 0.9% | Failed | Not Found |
+
+Use example.com placeholder addresses in demonstration data rather than real contact addresses.
+
+Platforms:
+
+- Instagram.
+- TikTok.
+- YouTube.
+
+Use recognizable platform icons or original SVG marks, not emoji.
+
+Followers:
+
+- Bold numeric value.
+- Smaller muted "followers" text.
+
+Engagement:
+
+- Bold percentage.
+- Smaller "Engagement" label.
+
+Qualification status:
+
+Passed example:
+
+"PASSED"
+
+Reason:
+
+"Engagement > 2.5%, Beauty & Skincare"
+
+Failed example:
+
+"FAILED"
+
+Reason:
+
+"Low engagement"
+
+Keep rejection explanations visible below the badge.
+
+Email/contact:
+
+- Example placeholder email with a clear illustrative status.
+- Verified email badge only when the sample explicitly represents a verified demo state.
+- Missing email should display "Not Found".
+
+Actions:
+
+For qualified creators:
+
+"Preview AI Pitch"
+
+For other rows:
+
+- Edit.
+- Email.
+- Delete.
+
+Buttons must have functional local UI interactions.
+
+The Edit button may open an editable local profile modal.
+
+The Delete button should ask for confirmation and only delete the local illustrative row.
+
+The Preview AI Pitch button must open or update the right-side AI Pitch Studio using the selected creator.
+
+## G. AI Pitch Studio — Right Drawer
+
+This is a signature part of the approved dashboard.
+
+Position:
+
+- Fixed on the right.
+- Width: 300px.
+- Top: 64px.
+- Height: `calc(100vh - 64px)`.
+- White surface.
+- Left border: #E5E7EB.
+- Shadow: `-4px 0 16px rgba(0, 0, 0, 0.04)`.
+
+Drawer header:
+
+"AI Pitch Studio"
+
+Selected creator subheading:
+
+"AI Pitch Preview: Creator A"
+
+Add a close button.
+
+### Card 1 — Email Pitch
+
+Label:
+
+"Email Pitch (60–90w)"
+
+Style:
+
+- Lavender surface #F5F3FF.
+- 12px radius.
+- White inner email preview window.
+- Small macOS-style decorative window indicators.
+- Editable message content.
+
+Example demonstration pitch:
+
+"Hi Creator A, your skincare-focused content themes may align with GlowCare's upcoming collaboration. We would love to explore a potential partnership and discuss a product review or UGC campaign. Would you be open to learning more?"
+
+Use this only as clearly labelled illustrative copy.
+
+Show a word-count indicator.
+
+Button/link:
+
+"Regenerate Draft"
+
+During this phase, regeneration should use local demonstration templates. Do not call Gemini.
+
+### Card 2 — Instagram DM
+
+Label:
+
+"Instagram DM (15–30w)"
+
+Show a conversational white message bubble on a light lavender card.
+
+Example:
+
+"Hi Creator A, your beauty and skincare content looks relevant to our upcoming GlowCare campaign. Would you be open to collaborating?"
+
+Actions:
+
+- Copy to Clipboard.
+- Manual Sending label.
+
+Use local demo copy only.
+
+Do not implement Instagram automation.
+
+### Drawer footer
+
+Keep a sticky footer at the bottom.
+
+Full-width primary button:
+
+"Approve & Queue Outreach"
+
+Clicking this action must NOT send an email.
+
+Instead:
+
+- Open a confirmation preview.
+- Clearly state that this is demo mode.
+- Allow the local row to move to a simulated "Approved / Queued" status.
+- Display a success message that explicitly says "Demo action only — no email was sent".
+
+This preserves the intended future workflow without pretending that Gmail is connected.
+
+The close drawer action must work. Provide a clear way to reopen the drawer.
+
+---
+
+# PART 6 — PAGE TWO: INFLUENCERS / CREATOR DISCOVERY
+
+Route:
+
+`/dashboard/influencers`
+
+This page must appear when the user clicks Influencers in the application sidebar.
+
+Use the second uploaded reference image as the primary visual guide.
+
+This page is a dedicated creator discovery/search workspace, not the main dashboard.
+
+## A. Main three-pane layout
+
+Reference target: 1440 × 810 desktop.
+
+Use:
+
+`grid-template-columns: 220px 260px minmax(0, 1fr)`
+
+Full-height application shell.
+
+Pane 1:
+
+220px left application navigation.
+
+Pane 2:
+
+260px filters sidebar.
+
+Pane 3:
+
+Remaining creator search workspace.
+
+The top tab bar begins to the right of the application sidebar and is 60px tall.
+
+The filters panel and creator results panel begin below the top tabs.
+
+Maintain independent scrolling for the filter and creator result areas.
+
+## B. Pane 1 — White Application Sidebar
+
+Width: 220px.
+
+Background: white.
+
+Border-right: 1px solid #E5E7EB.
+
+Padding: approximately 16px 12px.
+
+Logo:
+
+- MicroReach AI original geometric purple logo.
+- Wordmark.
+- Professional 17px bold appearance.
+
+Navigation items:
+
+- Dashboard.
+- Influencers.
+- Campaigns.
+- Content.
+- Incentives.
+- Messages.
+- Reports.
+- Tasks with badge 7.
+
+Active:
+
+Influencers.
+
+Active styling:
+
+- Background: #EDE9FE.
+- Text: #5B21B6.
+- Font weight: 600.
+- Border radius: 8px.
+
+Below a divider:
+
+- Settings.
+- Administration.
+- Help.
+
+Bottom area:
+
+- Overflow/more options icon.
+- Workspace switcher card showing L and Later.
+- Back to Landing Page.
+
+Keep the same navigation semantics as the Dashboard but use this white appearance as shown in the approved Influencers reference.
+
+## C. Pane 2 — Influencer Filters Sidebar
+
+Width: 260px.
+
+Position:
+
+- Starts below the 60px top navigation.
+- Full remaining height.
+- Background: #F7F7FA with white filter cards.
+- Padding: 16px 12px.
+
+The filter panel must have its own vertical scrolling.
+
+### Card 1 — Influencer Index
+
+Height: approximately 92px.
+
+White background, gray border, 12px radius and subtle shadow.
+
+Two tabs:
+
+1. Influencer Index.
+2. My Members.
+
+Influencer Index is active by default.
+
+Active tab:
+
+- Purple gradient from #5B21B6 to #6D28D9.
+- White text.
+- Full-width button.
+- 36px height.
+- 6px radius.
+
+My Members:
+
+- Neutral white surface.
+- Dark text.
+- Clickable.
+
+Clicking My Members switches to a clear local demo state.
+
+### Card 2 — Filters
+
+Title:
+
+"Filters"
+
+Below:
+
+"View All Filters →"
+
+Purple text and divider.
+
+Create the following filter groups.
+
+#### Group 1 — Influencer
+
+Accordion filters:
+
+- Location.
+- Demographics.
+- Attributes.
+- Performance.
+
+Add a "More filters" action.
+
+Each filter is a full-width dropdown/accordion row with:
+
+- 36px height.
+- Light gray border.
+- 6px radius.
+- Label left aligned.
+- Chevron on right.
+
+The controls should expand and collapse.
+
+#### Group 2 — Social Platforms
+
+Group title:
+
+"Social Platforms"
+
+Add "More filters".
+
+Accordion rows:
+
+- Connected Platforms.
+- Instagram.
+- TikTok.
+
+#### Group 3 — Instagram Audience
+
+Group title:
+
+"Instagram Audience"
+
+Add "More filters".
+
+Rows:
+
+- Location.
+- Demographics.
+
+Show a small lavender count badge `2` beside the Location filter as illustrative applied-filter state.
+
+### Filter functionality
+
+Implement working frontend filtering for the local demonstration creator data where possible.
+
+Filters should include:
+
+- Location.
+- Niche/category.
+- Platform.
+- Followers/subscribers.
+- Engagement.
+- Connected platforms.
+
+Do not call external APIs.
+
+Allow the user to remove applied filters.
+
+Add a Clear Filters action in the main toolbar.
+
+### Bottom filter actions
+
+Keep this area fixed to the bottom of the filter panel.
+
+Primary button:
+
+"Find Influencers"
+
+- Full width.
+- Height approximately 38px.
+- Purple background.
+- White text.
+- Pill shape.
+
+Below:
+
+A small illustrative results count.
+
+Example:
+
+"54 demo profiles"
+
+Below this:
+
+"Export CSV"
+
+On click:
+
+- Export only local illustrative records.
+- The downloaded filename must clearly identify it as demo data, such as `microreach-illustrative-demo-creators.csv`.
+- Never imply it contains genuinely discovered influencer records.
+
+When Find Influencers is clicked, apply the local filter state and show the matching local demo cards.
+
+Show a small message:
+
+"Demo preview — live creator discovery will be enabled after API integration."
+
+---
+
+## D. Pane 3 — Creator Discovery Workspace
+
+Background: #F7F7FA.
+
+Padding: approximately 16px 20px.
+
+This is the largest content area.
+
+The creator grid should be the main visual focus.
+
+### 1. Top Tab Navigation
+
+Height: 60px.
+
+Position: at the top of the Influencers workspace, to the right of the application sidebar.
+
+Tabs:
+
+- Search.
+- Summary.
+- Facebook Creator Search.
+
+Search is active by default.
+
+Active style:
+
+- Purple #5B21B6 background.
+- White text.
+- Rounded pill.
+
+Inactive tabs:
+
+- Dark ink text.
+- White header surface.
+
+Clicking each tab must switch the workspace content.
+
+Search tab:
+
+Show the full creator discovery UI.
+
+Summary tab:
+
+Show an honest summary of the current locally displayed demo result set, such as selected count, platform distribution and applied filters.
+
+Facebook Creator Search:
+
+Show a clean "Integration not configured" state. Do not pretend Facebook API access is available.
+
+### 2. Search Toolbar
+
+Search input:
+
+- Height 40px.
+- White background.
+- #E5E7EB border.
+- 8px radius.
+- Search icon.
+- Placeholder: Search.
+
+Right-side utility icons:
+
+- Microphone icon.
+- Clear search.
+- Settings.
+- More options.
+
+These controls should have meaningful local UI responses or clearly labelled disabled/coming-soon states.
+
+### 3. Sorting and Selection Toolbar
+
+Below search bar, create a horizontal toolbar.
+
+Left side:
+
+- Select all checkbox.
+- Result count.
+- Sort dropdown.
+
+Result count:
+
+"54 demo profiles"
+
+Sort dropdown:
+
+- Relevance.
+- Followers: High to Low.
+- Followers: Low to High.
+- Engagement: High to Low.
+
+Right side:
+
+- Selected count.
+- + List button.
+- + Campaign button.
+- Grid/List view toggle.
+
+The List button must open a local demonstration modal or popover.
+
+The Campaign button must open a campaign-selection preview using the GlowCare demo campaign.
+
+Do not save data to a database.
+
+Grid/List toggle must change the layout.
+
+### 4. Applied Filter Chips
+
+Below the toolbar:
+
+Show active filter pills, for example:
+
+- Beauty & Skincare.
+- India.
+
+Each chip:
+
+- Background #EDE9FE.
+- Text #5B21B6.
+- Fully rounded.
+- Small remove X.
+
+Add a Clear Filters text action.
+
+### 5. Creator Card Grid
+
+Desktop layout:
+
+`grid-template-columns: repeat(5, minmax(0, 1fr))`
+
+Gap: 12px.
+
+Show five columns on suitable large desktop screens, as in the reference.
+
+Each creator card:
+
+- White surface.
+- Border: 1px solid #E5E7EB.
+- Radius: 12px.
+- Subtle shadow.
+- 12px padding.
+- Centered content.
+- Relative positioning.
+
+Card contents in exact order:
+
+#### Top row
+
+- Checkbox in the top-left.
+- Centered 42px circular creator avatar.
+
+Checked checkbox:
+
+- Background #111827.
+- White check mark.
+
+Unchecked:
+
+- White background.
+- Gray border.
+
+Selection must work.
+
+#### Creator Identity
+
+Show:
+
+- Creator name.
+- Small location/context line.
+- Niche tags.
+
+Use generic demo identities:
+
+- Creator A.
+- Creator B.
+- Creator C.
+- Creator D.
+- Creator E.
+- Additional Creator F onward.
+
+Do not use real creator identities or real profile links.
+
+Example niche tags:
+
+- Beauty.
+- Skincare.
+- Lifestyle.
+- Fashion.
+- Wellness.
+
+Use a `+3` compact overflow tag where appropriate.
+
+The top of the Influencers page must visibly indicate:
+
+"Illustrative Demo Creators — not live discovery results"
+
+#### Content thumbnail collage
+
+Create a 3-column × 2-row thumbnail collage.
+
+Each card has six visual thumbnail tiles.
+
+The initial GlowCare demo campaign should use appropriate visual content themes:
+
+- Skincare routines.
+- Beauty product displays.
+- Cosmetics.
+- Personal care.
+- Lifestyle and wellness.
+- Product review-style imagery.
+
+Use locally available, permitted placeholder assets or original visual placeholders.
+
+Do not hotlink images from private accounts or fabricate real creator content.
+
+Thumbnail treatment:
+
+- Rounded 6px overall.
+- Small gaps.
+- Consistent aspect ratios.
+- Object-fit cover for image placeholders.
+
+#### Platform metrics
+
+At the bottom of each card, display three platform slots:
+
+- Instagram.
+- TikTok.
+- YouTube.
+
+For each platform:
+
+- Simple recognizable platform icon.
+- Example follower value.
+- Compact 11px number.
+
+Example illustrative metrics:
+
+- Instagram: 12.3K.
+- TikTok: 18.2K.
+- YouTube: 21.8K.
+
+All these values must be treated as illustrative demo values.
+
+If a creator has no platform, display a neutral unavailable state instead of inventing a number.
+
+### 6. Creator selection and actions
+
+Implement:
+
+- Individual checkbox selection.
+- Select all.
+- Selected count updates.
+- Add to List.
+- Add to Campaign.
+- Grid View.
+- List View.
+- Search creator names.
+- Filter cards.
+- Sort local demo records.
+- Clear filters.
+
+The List and Campaign actions should display a local modal/popover with confirmation and a clear "Demo only — not saved" message.
+
+---
+
+# PART 7 — DEMONSTRATION DATA RULES
+
+All current dashboard and influencer data is illustrative.
+
+This includes:
+
+- Creator names.
+- Avatars.
+- Followers.
+- Engagement rates.
+- Platform metrics.
+- Campaign counts.
+- Email addresses.
+- Profile details.
+- Status badges.
+- Outreach history.
+
+Use generic creator labels and safe example.com email addresses where needed.
+
+Display an unobtrusive but visible message:
+
+"Illustrative Demo Data — No external platform data is connected."
+
+Never show fictional demo profiles as genuinely discovered or verified people.
+
+Do not create fake contact emails.
+
+For future real data:
+
+- Missing email must be `Not Found`.
+- Inaccessible audience data must be `Not Available`.
+- Metrics must maintain their source and retrieval date.
+
+Do not claim a real YouTube, Instagram or Facebook API connection.
+
+---
+
+# PART 8 — LOCAL UI INTERACTIONS
+
+Build both pages as working frontend interfaces.
+
+## Dashboard interactions
+
+- Dashboard navigation.
+- Influencers navigation.
+- Campaign dropdown.
+- Global search field.
+- New Campaign demonstration modal.
+- Creator row selection.
+- Creator edit modal.
+- Creator deletion confirmation.
+- Preview AI Pitch.
+- Switch selected creator in AI Pitch Studio.
+- Close and reopen AI Pitch Studio.
+- Regenerate local demo message.
+- Copy email or DM text.
+- Simulate Approve & Queue Outreach.
+- Display status changes without real sending.
+- Back to Landing Page.
+
+## Influencers interactions
+
+- Search / Summary / Facebook Creator Search tabs.
+- Influencer Index / My Members switcher.
+- Expandable filters.
+- Filter selection.
+- More filters.
+- Search creator names.
+- Sort menu.
+- Applied filter removal.
+- Clear filters.
+- Select creator cards.
+- Select all.
+- List/Grid view.
+- Add to List preview.
+- Add to Campaign preview.
+- Find Influencers using local demo records.
+- Export illustrative demo CSV.
+
+Keep state synchronized within the relevant React page.
+
+Do not claim that local interactions persist after refresh.
+
+No external API calls.
+
+No database writes.
+
+No real messages sent.
+
+---
+
+# PART 9 — RESPONSIVE DESIGN
+
+The main references are desktop-first.
+
+However, both application pages must be responsive.
+
+## Dashboard
+
+### Desktop: 1440px and above
+
+- 240px dark left sidebar.
+- 64px header.
+- Flexible center workspace.
+- 300px AI Pitch Studio drawer.
+- Four KPI columns.
+- Full creator table.
+
+### Medium desktop and tablet: 1024–1439px
+
+- Sidebar may collapse to icon mode.
+- Main workspace expands.
+- AI Pitch Studio may become a toggleable side drawer.
+- KPI cards can wrap into two columns.
+- Creator table can scroll horizontally inside its panel.
+
+### Mobile: below 768px
+
+- Collapsible sidebar.
+- Header with compact campaign controls.
+- KPI cards in two columns.
+- Pipeline can wrap or become a vertical sequence.
+- Table can use a horizontal scroll container or stacked creator rows.
+- AI Pitch Studio becomes a full-width slide-over drawer.
+- Avoid global horizontal overflow.
+
+## Influencers
+
+### Desktop
+
+- 220px navigation sidebar.
+- 260px filter panel.
+- Remaining right creator search workspace.
+- Five-column grid where width permits.
+
+### Tablet
+
+- Application sidebar can collapse.
+- Filter panel becomes a toggleable drawer.
+- Grid reduces to three or four columns.
+
+### Mobile
+
+- Navigation becomes a compact menu.
+- Filters open in a slide-over drawer.
+- Search and toolbar controls wrap appropriately.
+- Creator grid reduces to one or two columns.
+- Cards preserve readable thumbnails and metrics.
+- All selection and filter controls remain usable.
+
+Ensure that the 3×2 thumbnail collage never becomes excessively small.
+
+---
+
+# PART 10 — PROJECT DIRECTORY STRUCTURE
+
+First inspect the actual current repository.
+
+The public landing page already exists and has been approved. Preserve every working homepage component.
+
+Add the new application modules incrementally.
+
+Use this recommended organization, adapting it to the actual codebase:
+
+```text
+MicroReach-AI/
+│
+├── public/
+│   ├── favicon.svg
+│   ├── images/
+│   │   ├── creator-placeholders/
+│   │   └── content-thumbnails/
+│   └── icons/
+│
+├── src/
+│   │
+│   ├── app/
+│   │   ├── App.tsx
+│   │   └── routes.tsx
+│   │
+│   ├── pages/
+│   │   ├── landing/
+│   │   │   └── LandingPage.tsx
+│   │   │
+│   │   ├── dashboard/
+│   │   │   └── DashboardPage.tsx
+│   │   │
+│   │   └── influencers/
+│   │       └── InfluencersPage.tsx
+│   │
+│   ├── components/
+│   │   │
+│   │   ├── app-shell/
+│   │   │   ├── AppSidebar.tsx
+│   │   │   ├── AppHeader.tsx
+│   │   │   ├── WorkspaceSwitcher.tsx
+│   │   │   └── ComingSoonPage.tsx
+│   │   │
+│   │   ├── dashboard/
+│   │   │   ├── DashboardKPIGrid.tsx
+│   │   │   ├── CampaignPipeline.tsx
+│   │   │   ├── CreatorPipelineTable.tsx
+│   │   │   ├── CreatorTableRow.tsx
+│   │   │   ├── CreatorEditModal.tsx
+│   │   │   └── NewCampaignModal.tsx
+│   │   │
+│   │   ├── ai-pitch-studio/
+│   │   │   ├── AIPitchStudio.tsx
+│   │   │   ├── EmailPitchCard.tsx
+│   │   │   ├── InstagramDMCard.tsx
+│   │   │   └── OutreachApprovalFooter.tsx
+│   │   │
+│   │   ├── influencers/
+│   │   │   ├── InfluencerTopTabs.tsx
+│   │   │   ├── InfluencerFilterPanel.tsx
+│   │   │   ├── InfluencerSearchToolbar.tsx
+│   │   │   ├── AppliedFilters.tsx
+│   │   │   ├── CreatorGrid.tsx
+│   │   │   ├── CreatorCard.tsx
+│   │   │   ├── CreatorListView.tsx
+│   │   │   ├── CreatorThumbnailGrid.tsx
+│   │   │   ├── CreatorMetrics.tsx
+│   │   │   └── AddToCampaignModal.tsx
+│   │   │
+│   │   └── ui/
+│   │       ├── Button.tsx
+│   │       ├── IconButton.tsx
+│   │       ├── Badge.tsx
+│   │       ├── Checkbox.tsx
+│   │       ├── Dropdown.tsx
+│   │       ├── SearchInput.tsx
+│   │       ├── Modal.tsx
+│   │       ├── Tooltip.tsx
+│   │       ├── Accordion.tsx
+│   │       └── EmptyState.tsx
+│   │
+│   ├── data/
+│   │   ├── dashboardDemoData.ts
+│   │   ├── influencerDemoData.ts
+│   │   └── navigation.ts
+│   │
+│   ├── hooks/
+│   │   ├── useDashboardState.ts
+│   │   └── useInfluencerFilters.ts
+│   │
+│   ├── types/
+│   │   ├── dashboard.ts
+│   │   └── influencer.ts
+│   │
+│   ├── styles/
+│   │   ├── dashboard.css
+│   │   ├── influencers.css
+│   │   └── app-shell.css
+│   │
+│   ├── utils/
+│   │   ├── downloadDemoCSV.ts
+│   │   └── copyToClipboard.ts
+│   │
+│   ├── sections/
+│   │   └── existing landing page sections
+│   │
+│   └── main.tsx
+│
+├── docs/
+│   ├── landing-page-architecture.md
+│   └── dashboard-ui-architecture.md
+│
+├── tests/
+│   ├── dashboard/
+│   └── influencers/
+│
+├── index.html
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+└── .gitignore
+```
+
+Do not recreate existing landing sections in duplicate.
+
+Reuse the existing public homepage as the `/` route.
+
+Keep the new dashboard and Influencers modules separated from marketing website sections.
+
+Do not create unnecessary empty files.
+
+Do not put the entire dashboard or Influencers UI inside a single massive component.
+
+---
+
+# PART 11 — EXISTING GOOGLE AI STUDIO WORKSPACE RULES
+
+- Inspect existing source files before modifications.
+- Preserve the existing Vite, React, TypeScript and styling configuration.
+- Preserve the current package manager and lockfile.
+- Do not overwrite the existing landing page.
+- Do not create a new project inside the existing project.
+- Do not manually create `.aistudio/` or `aistudio/` as an application source directory.
+- Do not put components or assets inside platform-managed internal directories.
+- Do not blindly delete platform-managed workspace files.
+- Keep application code inside the normal `src/` structure.
+- Keep private workspace information out of public assets and production build output.
+
+---
+
+# PART 12 — EXPLICITLY DEFERRED FEATURES
+
+This phase is UI implementation only.
+
+Do not implement:
+
+- Supabase project connection.
+- PostgreSQL database schema.
+- Supabase Auth.
+- Login validation.
+- Sign-up.
+- Password reset.
+- Protected route guards.
+- YouTube API integration.
+- Instagram API integration.
+- Facebook Creator Search integration.
+- Gemini API calls.
+- Gmail OAuth.
+- Actual email sending.
+- Actual Instagram DM sending.
+- Persistent campaigns.
+- Persistent influencer records.
+- Real analytics.
+
+All interactions must remain local demonstration behaviour.
+
+The only route flow at present is direct navigation from the public marketing homepage to the Dashboard.
+
+Authentication will be integrated later after the dashboard and related page designs are finalized.
+
+---
+
+# PART 13 — CODE QUALITY AND PROJECT-WIDE RULES
+
+- Use strict TypeScript.
+- Avoid `any`.
+- Use reusable, maintainable components.
+- Use semantic HTML.
+- Use accessible form controls and buttons.
+- Handle local UI errors appropriately.
+- Avoid duplicate functions and components.
+- Use asynchronous APIs where required.
+- Avoid unnecessary dependencies.
+- Never hardcode secret credentials.
+- Write meaningful comments only where useful.
+- No emojis anywhere in code, UI, comments, filenames, README or documentation.
+- Use Lucide icons or suitable original SVG icons.
+- Do not use decorative Unicode symbols as substitute icons.
+- Do not generate fake influencer data and present it as real.
+- Do not claim that any external integration is connected.
+- Do not claim that an email was sent when only a local preview occurred.
+
+---
+
+# PART 14 — IMPLEMENTATION ORDER
+
+Follow this exact implementation sequence.
+
+### Step 1 — Repository Inspection
+
+Inspect the existing landing page, application entry point, routes, components, styles and dependencies.
+
+Report what currently exists before changing it.
+
+### Step 2 — Route Configuration
+
+Implement:
+
+- `/`
+- `/dashboard`
+- `/dashboard/influencers`
+
+Connect all landing page Login and Get Started CTAs directly to `/dashboard`.
+
+### Step 3 — Shared Navigation
+
+Create the application navigation with the page-specific sidebar appearance.
+
+Make Dashboard and Influencers navigation functional.
+
+### Step 4 — Main Dashboard
+
+Implement the first reference screenshot accurately:
+
+- Dark sidebar.
+- Workspace header.
+- KPI cards.
+- Pipeline status.
+- Creator Pipeline & Verification table.
+- Fixed AI Pitch Studio right drawer.
+
+### Step 5 — Influencers Page
+
+Implement the second reference screenshot accurately:
+
+- White left navigation sidebar.
+- Top Search/Summary/Facebook tabs.
+- Middle filters panel.
+- Search toolbar.
+- Sorting and selection.
+- Applied filter chips.
+- Five-column creator-card grid.
+- Thumbnail collages.
+- Platform metrics.
+- List/Grid toggle.
+- Add to List and Add to Campaign actions.
+- Find Influencers.
+- Export CSV.
+
+### Step 6 — Local Interactions
+
+Implement all described local interactions and demo confirmations.
+
+### Step 7 — Responsive Layout
+
+Test desktop, tablet and mobile.
+
+Ensure the fixed panels, tables, drawer and creator grid adapt correctly.
+
+### Step 8 — Verification
+
+Run:
+
+- TypeScript checks.
+- Lint checks if configured.
+- Production build.
+- Route navigation checks.
+- Responsive layout checks.
+
+Fix any errors caused by your implementation.
+
+### Step 9 — Implementation Report
+
+Provide:
+
+- New files created.
+- Existing files modified.
+- Routes added.
+- Dashboard components implemented.
+- Influencers components implemented.
+- Interactive behaviour implemented.
+- Tests and build results.
+- Features intentionally deferred.
+
+---
+
+# FINAL ACCEPTANCE CRITERIA
+
+The task is complete only when:
+
+1. The approved public homepage remains visually and functionally intact.
+2. Login navigates directly to `/dashboard`.
+3. Get Started navigates directly to `/dashboard`.
+4. Start Free Outreach navigates directly to `/dashboard`.
+5. No authentication page or error is shown.
+6. The Dashboard visually follows Reference A.
+7. The Influencers page visually follows Reference B.
+8. Clicking Influencers opens `/dashboard/influencers`.
+9. The Dashboard has its KPI cards, campaign pipeline, creator table and AI Pitch Studio drawer.
+10. The Influencers page has its separate filter pane and five-column discovery grid on large desktop.
+11. Search, selection, sorting, tabs, filters and view switching work locally.
+12. Export CSV downloads clearly labelled illustrative demo data.
+13. No real email or DM is sent.
+14. No Supabase or external API is connected.
+15. Both pages work responsively.
+16. The project builds successfully.
+17. No fake data is represented as real discovered influencer data.
+18. No emojis appear anywhere.
+
+IMPORTANT FINAL INSTRUCTION:
+
+Do not modify or redesign the approved public homepage.
+
+Do not start Supabase or authentication work.
+
+Do not build only a static screenshot.
+
+Build the actual working React pages and route navigation using the two supplied design references as the visual source of truth.
+
+Prioritize faithful layout, accurate dimensions, readability, whitespace, clean typography and the actual operational workflow shown in both references.

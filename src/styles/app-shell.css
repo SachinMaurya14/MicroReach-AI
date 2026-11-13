@@ -1,0 +1,17 @@
+.mr-app-shell {
+  font-family: var(--mr-font-sans);
+}
+
+.mr-scroll-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.mr-scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mr-scroll-thin::-webkit-scrollbar-thumb {
+  background-color: #D1D5DB;
+  border-radius: 9999px;
+}

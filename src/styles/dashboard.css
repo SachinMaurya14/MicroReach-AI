@@ -1,0 +1,10 @@
+.mr-dashboard-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(17, 24, 39, 0.04);
+}
+
+.mr-pitch-drawer {
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.04);
+}

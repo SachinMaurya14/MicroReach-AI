@@ -1,0 +1,38 @@
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '../../src/types/database.ts';
+import { getServerConfig } from '../config/env.ts';
+
+let cachedAdminClient: SupabaseClient<Database> | null = null;
+let cachedSignature = '';
+
+export function isSupabaseAdminConfigured(): boolean {
+  const cfg = getServerConfig();
+  return Boolean(cfg.supabaseUrl && cfg.supabaseSecretKey);
+}
+
+export function getSupabaseAdmin(): SupabaseClient<Database> | null {
+  const cfg = getServerConfig();
+  if (!cfg.supabaseUrl || !cfg.supabaseSecretKey) {
+    return null;
+  }
+
+  // Reject accidentally passed publishable/anon keys on admin client
+  if (cfg.supabaseSecretKey.startsWith('sb_publishable_')) {
+    return null;
+  }
+
+  const signature = `${cfg.supabaseUrl}:${cfg.supabaseSecretKey.slice(0, 12)}`;
+  if (cachedAdminClient && cachedSignature === signature) {
+    return cachedAdminClient;
+  }
+
+  cachedAdminClient = createClient<Database>(cfg.supabaseUrl, cfg.supabaseSecretKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  });
+  cachedSignature = signature;
+  return cachedAdminClient;
+}

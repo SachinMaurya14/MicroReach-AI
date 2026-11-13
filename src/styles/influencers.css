@@ -1,0 +1,11 @@
+.mr-influencers-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(17, 24, 39, 0.04);
+}
+
+.mr-index-active {
+  background: linear-gradient(90deg, #5B21B6 0%, #6D28D9 100%);
+  color: #FFFFFF;
+}
