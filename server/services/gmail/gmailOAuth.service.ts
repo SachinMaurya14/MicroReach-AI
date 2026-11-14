@@ -5,6 +5,7 @@ import {
   decryptSecretAes256Gcm,
   type EncryptedPayload,
   encryptSecretAes256Gcm,
+  sha256Hex,
   signOAuthState,
   verifyOAuthState,
 } from '../../utils/crypto.ts';
@@ -201,6 +202,33 @@ export async function handleGmailOAuthCallback(input: {
       'supabase_not_configured',
       'Supabase server backend is not configured yet (SUPABASE_URL and SUPABASE_SECRET_KEY).'
     );
+  }
+
+  // Cross-instance OAuth state replay protection backed by Supabase when available
+  if (stateCheck.nonce) {
+    const nonceHash = sha256Hex(stateCheck.nonce);
+    try {
+      const { data: priorNonce } = await admin
+        .from('demo_audit_logs')
+        .select('id')
+        .eq('action', 'oauth_state_consumed')
+        .eq('entity_id', nonceHash)
+        .limit(1);
+
+      if (priorNonce && priorNonce.length > 0) {
+        throw new AppHttpError(
+          403,
+          'invalid_oauth_state',
+          'OAuth state validation failed (state_already_used).'
+        );
+      }
+
+      await recordAuditLog('oauth_state_consumed', 'oauth_state', nonceHash, {
+        sessionSid: stateCheck.sid ?? null,
+      });
+    } catch (err) {
+      if (err instanceof AppHttpError) throw err;
+    }
   }
 
   const controller = new AbortController();

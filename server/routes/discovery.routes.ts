@@ -30,7 +30,9 @@ discoveryRouter.post('/discovery/youtube', discoveryRateLimiter, async (req, res
       fetchWebsites,
     });
 
-    res.status(202).json({ run });
+    const statusCode =
+      run.status === 'pending' || run.status === 'running' ? 202 : 200;
+    res.status(statusCode).json({ run });
   } catch (err) {
     next(err);
   }

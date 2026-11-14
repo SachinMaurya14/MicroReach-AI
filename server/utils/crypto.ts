@@ -175,6 +175,7 @@ function pruneConsumedOAuthNonces(nowSec: number): void {
 export interface OAuthStateVerificationResult {
   valid: boolean;
   sid?: string;
+  nonce?: string;
   reason?: string;
 }
 
@@ -257,7 +258,7 @@ export function verifyOAuthState(
       consumedOAuthNonces.set(decoded.nonce, decoded.exp);
     }
 
-    return { valid: true, sid: decoded.sid };
+    return { valid: true, sid: decoded.sid, nonce: decoded.nonce };
   } catch {
     return { valid: false, reason: 'invalid_state' };
   }

@@ -45,7 +45,7 @@ export interface ServerConfig {
 export function getServerConfig(): ServerConfig {
   const port = Number(process.env.PORT || 3000) || 3000;
   const nodeEnv = cleanEnv('NODE_ENV') || 'development';
-  const isProduction = nodeEnv === 'production';
+  const isProduction = nodeEnv === 'production' || process.env.VERCEL === '1';
 
   const supabaseUrl = cleanEnv('SUPABASE_URL') || cleanEnv('VITE_SUPABASE_URL');
   const supabaseSecretKey = cleanEnv('SUPABASE_SECRET_KEY');

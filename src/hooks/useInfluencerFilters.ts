@@ -388,9 +388,23 @@ export function useInfluencerFilters() {
         targetCount: 50,
       });
       setActiveRun(run);
-      setDiscoveryBanner(
-        'YouTube Data API v3 discovery started (targeting up to 50 genuine Beauty & Skincare profiles)...'
-      );
+      if (run.status === 'completed') {
+        setDiscovering(false);
+        await loadWorkspaceRecords();
+        setDiscoveryBanner(
+          `YouTube discovery completed: ${run.profiles_found ?? 0} real profiles evaluated and stored.`
+        );
+      } else if (run.status === 'failed') {
+        setDiscovering(false);
+        setDiscoveryBanner(run.error_message || 'YouTube discovery run failed.');
+      } else if (run.status === 'cancelled') {
+        setDiscovering(false);
+        setDiscoveryBanner('YouTube discovery run was cancelled.');
+      } else {
+        setDiscoveryBanner(
+          'YouTube Data API v3 discovery started (targeting up to 50 genuine Beauty & Skincare profiles)...'
+        );
+      }
     } catch (err) {
       setDiscovering(false);
       setDiscoveryBanner(

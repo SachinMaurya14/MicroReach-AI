@@ -32,6 +32,8 @@ interface CachedEntry<T> {
 
 const apiCache = new Map<string, CachedEntry<unknown>>();
 let activeDiscoveryRunId: string | null = null;
+const ACTIVE_RUN_STALE_WINDOW_MS = 5 * 60 * 1000;
+const SERVERLESS_TIME_BUDGET_MS = 42_000;
 
 function getCached<T>(key: string): T | null {
   const entry = apiCache.get(key);
@@ -298,7 +300,25 @@ export async function startYouTubeDiscoveryRun(
     );
   }
 
+  const isServerless = Boolean(process.env.VERCEL);
   if (activeDiscoveryRunId) {
+    throw new AppHttpError(
+      409,
+      'discovery_already_running',
+      'A YouTube discovery run is already in progress. Wait for completion or cancel it first.'
+    );
+  }
+
+  // Cross-instance active run lock backed by Supabase (auto-expires stale runs after 5 min)
+  const staleCutoff = new Date(Date.now() - ACTIVE_RUN_STALE_WINDOW_MS).toISOString();
+  const { data: activeRows } = await admin
+    .from('discovery_runs')
+    .select('id')
+    .in('status', ['pending', 'running'])
+    .gte('created_at', staleCutoff)
+    .limit(1);
+
+  if (activeRows && activeRows.length > 0) {
     throw new AppHttpError(
       409,
       'discovery_already_running',
@@ -406,8 +426,7 @@ export async function startYouTubeDiscoveryRun(
     queriesCount: queries.length,
   });
 
-  // Execute bounded asynchronous discovery job while persisting progress in Supabase
-  void executeDiscoveryPipeline({
+  const pipelinePromise = executeDiscoveryPipeline({
     runId: runRecord.id,
     campaignId,
     queries,
@@ -415,12 +434,22 @@ export async function startYouTubeDiscoveryRun(
     criteria,
     apiKey: cfg.youtubeApiKey,
     fetchWebsites: Boolean(input.fetchWebsites),
+    timeBudgetMs: isServerless ? SERVERLESS_TIME_BUDGET_MS : undefined,
+    concurrency: isServerless ? 6 : 3,
   }).finally(() => {
     if (activeDiscoveryRunId === runRecord?.id) {
       activeDiscoveryRunId = null;
     }
   });
 
+  // Vercel freezes background work once an HTTP response is sent; await completion synchronously on Vercel.
+  if (isServerless) {
+    await pipelinePromise;
+    return getDiscoveryRunById(runRecord.id);
+  }
+
+  // Persistent Node/Render runtime executes discovery asynchronously while UI polls progress.
+  void pipelinePromise;
   return runRecord;
 }
 
@@ -438,12 +467,17 @@ async function executeDiscoveryPipeline(opts: {
   };
   apiKey: string;
   fetchWebsites: boolean;
+  timeBudgetMs?: number;
+  concurrency?: number;
 }): Promise<void> {
   const admin = getSupabaseAdmin();
   if (!admin) return;
 
   let quotaUsed = 0;
-  const startedAt = new Date().toISOString();
+  const startedAtMs = Date.now();
+  const startedAt = new Date(startedAtMs).toISOString();
+  const isNearTimeBudget = () =>
+    Boolean(opts.timeBudgetMs && Date.now() - startedAtMs >= opts.timeBudgetMs);
 
   try {
     await safeUpdateRun(opts.runId, {
@@ -547,9 +581,10 @@ async function executeDiscoveryPipeline(opts: {
     let persistedCount = 0;
     const processedRecords = await mapWithConcurrency(
       dedupedChannels,
-      3,
+      opts.concurrency ?? 3,
       async (ch) => {
         if (await isRunCancelled(opts.runId)) return null;
+        if (isNearTimeBudget()) return null;
 
         const retrievedAt = new Date().toISOString();
         const title = ch.snippet?.title?.trim() || `YouTube Channel ${ch.id}`;
