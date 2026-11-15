@@ -1,13 +1,13 @@
 import dotenv from 'dotenv';
 import path from 'node:path';
 
-// Load .env.local first in development (if present), then fallback to .env
-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+// Load .env.local with override so explicitly configured local keys take precedence over stale runtime defaults
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local'), override: true });
 dotenv.config();
 
 export type OutreachMode = 'simulation' | 'live';
 
-const DEFAULT_GEMINI_MODEL = 'gemini-4-hydrogen';
+const DEFAULT_GEMINI_MODEL = 'gemini-3.6-flash';
 
 function cleanEnv(name: string): string {
   return (process.env[name] ?? '').trim();
@@ -40,6 +40,8 @@ export interface ServerConfig {
   googleClientSecret: string;
   googleRedirectUri: string;
   integrationEncryptionKey: string;
+  evaluatorAccessPassword: string;
+  apifyToken: string;
 }
 
 export function getServerConfig(): ServerConfig {
@@ -48,9 +50,13 @@ export function getServerConfig(): ServerConfig {
   const isProduction = nodeEnv === 'production' || process.env.VERCEL === '1';
 
   const supabaseUrl = cleanEnv('SUPABASE_URL') || cleanEnv('VITE_SUPABASE_URL');
-  const supabaseSecretKey = cleanEnv('SUPABASE_SECRET_KEY');
+  const supabaseSecretKey =
+    cleanEnv('SUPABASE_SECRET_KEY') ||
+    cleanEnv('SUPABASE_SECRET') ||
+    cleanEnv('SUPABASE_SERVICE_ROLE_KEY') ||
+    cleanEnv('VITE_SUPABASE_PUBLISHABLE_KEY');
   const demoAccessToken = cleanEnv('DEMO_ACCESS_TOKEN');
-  const demoSessionSecret = cleanEnv('DEMO_SESSION_SECRET');
+  const demoSessionSecret = cleanEnv('DEMO_SESSION_SECRET') || cleanEnv('DEMO_SESSION_SE');
   const youtubeApiKey = cleanEnv('YOUTUBE_API_KEY');
   const geminiApiKey = cleanEnv('GEMINI_API_KEY');
   const rawModel = cleanEnv('GEMINI_MODEL');
@@ -61,9 +67,11 @@ export function getServerConfig(): ServerConfig {
 
   const googleClientId = cleanEnv('GOOGLE_CLIENT_ID');
   const googleClientSecret = cleanEnv('GOOGLE_CLIENT_SECRET');
-  const rawGoogleRedirectUri = cleanEnv('GOOGLE_REDIRECT_URI');
+  const rawGoogleRedirectUri = cleanEnv('GOOGLE_REDIRECT_URI') || cleanEnv('GOOGLE_REDIRECT_');
   const googleRedirectUri = isValidHttpUrl(rawGoogleRedirectUri) ? rawGoogleRedirectUri : '';
-  const integrationEncryptionKey = cleanEnv('INTEGRATION_ENCRYPTION_KEY');
+  const integrationEncryptionKey = cleanEnv('INTEGRATION_ENCRYPTION_KEY') || cleanEnv('INTEGRATION_ENCRYPTION');
+  const evaluatorAccessPassword = cleanEnv('EVALUATOR_ACCESS_PASSWORD');
+  const apifyToken = cleanEnv('APIFY_TOKEN') || cleanEnv('APIFY_API_TOKEN');
 
   return {
     port,
@@ -82,6 +90,8 @@ export function getServerConfig(): ServerConfig {
     googleClientSecret,
     googleRedirectUri,
     integrationEncryptionKey,
+    evaluatorAccessPassword,
+    apifyToken,
   };
 }
 
@@ -121,6 +131,7 @@ export interface NonSensitiveHealthStatus {
   demoAccessConfigured: boolean;
   supabaseConfigured: boolean;
   youtubeConfigured: boolean;
+  apifyConfigured: boolean;
   geminiConfigured: boolean;
   geminiModel: string;
   outreachMode: OutreachMode;
@@ -148,6 +159,7 @@ export function getNonSensitiveHealthStatus(): NonSensitiveHealthStatus {
     demoAccessConfigured,
     supabaseConfigured,
     youtubeConfigured: Boolean(cfg.youtubeApiKey),
+    apifyConfigured: Boolean(cfg.apifyToken),
     geminiConfigured: Boolean(cfg.geminiApiKey),
     geminiModel: cfg.geminiModel,
     outreachMode: cfg.outreachMode,

@@ -1,12 +1,17 @@
 import React from 'react';
-import { DashboardCreatorRow } from '../../types/dashboard';
+import { Download } from 'lucide-react';
+import { DashboardCreatorRow, DashboardQualFilter } from '../../types/dashboard';
 import { CreatorTableRow } from './CreatorTableRow';
 
 interface CreatorPipelineTableProps {
   creators: DashboardCreatorRow[];
+  totalCreatorCount: number;
   selectedRowIds: string[];
   activeCreatorId: string | null;
-  isShowingDemoFallback?: boolean;
+  qualFilter: DashboardQualFilter;
+  onQualFilterChange: (next: DashboardQualFilter) => void;
+  onExportCreatorsCsv: () => void;
+  onExportOutreachCsv: () => void;
   onToggleSelectRow: (id: string) => void;
   onToggleSelectAll: () => void;
   onPreviewPitch: (id: string) => void;
@@ -16,9 +21,13 @@ interface CreatorPipelineTableProps {
 
 export const CreatorPipelineTable: React.FC<CreatorPipelineTableProps> = ({
   creators,
+  totalCreatorCount,
   selectedRowIds,
   activeCreatorId,
-  isShowingDemoFallback = true,
+  qualFilter,
+  onQualFilterChange,
+  onExportCreatorsCsv,
+  onExportOutreachCsv,
   onToggleSelectRow,
   onToggleSelectAll,
   onPreviewPitch,
@@ -30,15 +39,47 @@ export const CreatorPipelineTable: React.FC<CreatorPipelineTableProps> = ({
 
   return (
     <section aria-label="Creator pipeline and verification" className="mr-dashboard-card overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4 border-b border-[#E5E7EB]">
-        <h2 className="text-[17px] font-semibold text-[#111827]">
-          Creator Pipeline &amp; Verification
-        </h2>
-        <span className="text-xs text-[#6B7280] mr-tabular">
-          {creators.length}{' '}
-          {isShowingDemoFallback ? 'illustrative demo' : 'verified workspace'}{' '}
-          {creators.length === 1 ? 'row' : 'rows'}
-        </span>
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-[#E5E7EB]">
+        <div className="flex items-center gap-3">
+          <h2 className="text-[17px] font-semibold text-[#111827]">
+            Creator Pipeline &amp; Verification
+          </h2>
+          <span className="text-xs text-[#6B7280] mr-tabular">
+            {creators.length} {creators.length === 1 ? 'row' : 'rows'}
+          </span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            aria-label="Filter by qualification status"
+            value={qualFilter}
+            onChange={(e) => onQualFilterChange(e.target.value as DashboardQualFilter)}
+            className="h-8 rounded-lg border border-[#D1D5DB] bg-white px-2.5 text-xs font-medium text-[#111827] cursor-pointer"
+          >
+            <option value="all">All Statuses</option>
+            <option value="qualified">Qualified</option>
+            <option value="needs_review">Needs Review</option>
+            <option value="rejected">Rejected</option>
+          </select>
+
+          <button
+            type="button"
+            onClick={onExportCreatorsCsv}
+            className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#D1D5DB] bg-white px-2.5 text-xs font-semibold text-[#111827] hover:bg-[#F9FAFB] cursor-pointer"
+          >
+            <Download className="h-3.5 w-3.5 text-[#5B21B6]" aria-hidden="true" />
+            <span>Creators CSV</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onExportOutreachCsv}
+            className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#D1D5DB] bg-white px-2.5 text-xs font-semibold text-[#111827] hover:bg-[#F9FAFB] cursor-pointer"
+          >
+            <Download className="h-3.5 w-3.5 text-[#5B21B6]" aria-hidden="true" />
+            <span>Outreach CSV</span>
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto mr-scroll-thin">
@@ -66,8 +107,10 @@ export const CreatorPipelineTable: React.FC<CreatorPipelineTableProps> = ({
           <tbody className="divide-y divide-[#E5E7EB]">
             {creators.length === 0 ? (
               <tr>
-                <td colSpan={8} className="py-10 text-center text-sm text-[#6B7280]">
-                  No creator rows match your search filter.
+                <td colSpan={8} className="py-10 px-4 text-center text-sm text-[#6B7280]">
+                  {totalCreatorCount === 0
+                    ? 'No creators linked to this campaign yet. Open Influencers to run live YouTube discovery.'
+                    : 'No creator rows match your current search or qualification status filter.'}
                 </td>
               </tr>
             ) : (

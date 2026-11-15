@@ -440,12 +440,12 @@ export const InfluencerFilterPanel: React.FC<InfluencerFilterPanelProps> = ({
           className="flex h-[38px] w-full items-center justify-center gap-2 rounded-full bg-[#5B21B6] px-4 text-[13px] font-semibold text-white hover:bg-[#6D28D9] disabled:opacity-60 transition-colors cursor-pointer"
         >
           {discovering && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
-          <span>{discovering ? 'Discovering YouTube...' : 'Find Influencers'}</span>
+          <span>{discovering ? 'Discovering Creators...' : 'Find Influencers'}</span>
         </button>
 
         <div className="flex items-center justify-between px-1 text-[11px] text-[#6B7280] mr-tabular">
           <span>
-            {resultCount} {isShowingDemoFallback ? 'demo profiles' : 'stored profiles'}
+            {resultCount} {resultCount === 1 ? 'stored profile' : 'stored profiles'}
           </span>
           <button
             type="button"

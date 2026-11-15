@@ -18,41 +18,49 @@ demoRouter.post(
   accessExchangeRateLimiter,
   async (req, res) => {
     const cfg = getServerConfig();
-    if (!cfg.demoAccessToken || !cfg.demoSessionSecret) {
+    if ((!cfg.demoAccessToken || !cfg.demoSessionSecret) && !cfg.evaluatorAccessPassword) {
       res.status(503).json({
         error: 'demo_access_not_configured',
         message:
-          'Shared workspace invitation access is not configured on the server yet (DEMO_ACCESS_TOKEN and DEMO_SESSION_SECRET).',
+          'Shared workspace invitation access is not configured on the server yet (DEMO_ACCESS_TOKEN and DEMO_SESSION_SECRET or EVALUATOR_ACCESS_PASSWORD).',
       });
       return;
     }
 
     const rawToken =
       typeof req.body?.token === 'string' ? req.body.token.trim() : '';
+    const rawPassword =
+      typeof req.body?.password === 'string' ? req.body.password.trim() : '';
+    const submitted = rawToken || rawPassword;
 
-    if (!rawToken || rawToken.length > 512) {
+    if (!submitted || submitted.length > 512) {
       res.status(400).json({
         error: 'missing_token',
-        message: 'A valid invitation token is required.',
+        message: 'A valid invitation token or evaluator password is required.',
       });
       return;
     }
 
-    // Constant-time verification without logging the raw token
-    if (!constantTimeEqual(rawToken, cfg.demoAccessToken)) {
+    const matchesToken = Boolean(cfg.demoAccessToken && constantTimeEqual(submitted, cfg.demoAccessToken));
+    const matchesPassword = Boolean(cfg.evaluatorAccessPassword && constantTimeEqual(submitted, cfg.evaluatorAccessPassword));
+
+    if (!matchesToken && !matchesPassword) {
       await recordAuditLog('demo_access_rejected', 'demo_session', null, {
         reason: 'invalid_token',
       });
       res.status(401).json({
         error: 'invalid_invitation_token',
-        message: 'This invitation link is invalid or has been rotated.',
+        message: 'This invitation link or evaluator password is invalid.',
       });
       return;
     }
 
+    const signingSecret = cfg.demoSessionSecret || cfg.evaluatorAccessPassword;
+    const signingTokenId = cfg.demoAccessToken || cfg.evaluatorAccessPassword!;
+
     const { token, payload } = signDemoSessionToken(
-      cfg.demoSessionSecret,
-      cfg.demoAccessToken
+      signingSecret,
+      signingTokenId
     );
 
     setDemoSessionCookie(req, res, token);

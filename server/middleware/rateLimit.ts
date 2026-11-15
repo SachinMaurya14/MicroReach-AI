@@ -78,16 +78,16 @@ export const apiSessionRateLimiter = createRateLimiter({
 
 export const discoveryRateLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000,
-  maxRequests: 6,
+  maxRequests: 30,
   keyGenerator: (req) => `disc:${req.demoSession?.sid ?? getClientIp(req)}`,
-  message: 'Hourly YouTube discovery limit reached for this demo session to protect API quota.',
+  message: 'Hourly discovery limit reached for this workspace session to protect API quota.',
 });
 
 export const geminiRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
-  maxRequests: 35,
+  maxRequests: 60,
   keyGenerator: (req) => `gem:${req.demoSession?.sid ?? getClientIp(req)}`,
-  message: 'AI pitch generation rate limit reached. Please wait a few minutes.',
+  message: 'AI personalization rate limit reached. Please wait a few minutes.',
 });
 
 export const oauthCallbackRateLimiter = createRateLimiter({

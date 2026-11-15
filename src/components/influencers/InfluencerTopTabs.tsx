@@ -1,5 +1,6 @@
 import React from 'react';
-import { Menu, SlidersHorizontal } from 'lucide-react';
+import { ArrowLeft, Menu, SlidersHorizontal } from 'lucide-react';
+import { useAppRouter } from '../../app/routes';
 import { InfluencerTopTab } from '../../types/influencer';
 
 interface InfluencerTopTabsProps {
@@ -21,6 +22,8 @@ export const InfluencerTopTabs: React.FC<InfluencerTopTabsProps> = ({
   onOpenMobileMenu,
   onOpenMobileFilters,
 }) => {
+  const { navigate } = useAppRouter();
+
   return (
     <header className="h-[60px] shrink-0 bg-white border-b border-[#E5E7EB] px-4 sm:px-6 flex items-center justify-between gap-3">
       <div className="flex items-center gap-2 lg:hidden">
@@ -58,16 +61,28 @@ export const InfluencerTopTabs: React.FC<InfluencerTopTabsProps> = ({
         })}
       </nav>
 
-      {/* Mobile / Tablet Filter Drawer Trigger */}
-      <div className="xl:hidden shrink-0">
+      <div className="flex items-center gap-2 shrink-0">
         <button
           type="button"
-          onClick={onOpenMobileFilters}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-xs font-semibold text-[#111827] hover:bg-[#F9FAFB] cursor-pointer"
+          onClick={() => navigate('/dashboard')}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-xs font-semibold text-[#111827] hover:bg-[#F9FAFB] cursor-pointer whitespace-nowrap"
         >
-          <SlidersHorizontal className="h-3.5 w-3.5 text-[#5B21B6]" aria-hidden="true" />
-          <span>Filters</span>
+          <ArrowLeft className="h-3.5 w-3.5 text-[#5B21B6]" aria-hidden="true" />
+          <span className="hidden sm:inline">Back to Dashboard</span>
+          <span className="sm:hidden">Dashboard</span>
         </button>
+
+        {/* Mobile / Tablet Filter Drawer Trigger */}
+        <div className="xl:hidden shrink-0">
+          <button
+            type="button"
+            onClick={onOpenMobileFilters}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-xs font-semibold text-[#111827] hover:bg-[#F9FAFB] cursor-pointer"
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5 text-[#5B21B6]" aria-hidden="true" />
+            <span>Filters</span>
+          </button>
+        </div>
       </div>
     </header>
   );

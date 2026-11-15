@@ -6,7 +6,7 @@ interface DashboardKPIGridProps {
   qualifiedCount: number;
   enrichedCount: number;
   outreachQueuedCount: number;
-  isShowingDemoFallback: boolean;
+  isBackendConnected: boolean;
   gmailStatusLabel: string;
 }
 
@@ -15,7 +15,7 @@ export const DashboardKPIGrid: React.FC<DashboardKPIGridProps> = ({
   qualifiedCount,
   enrichedCount,
   outreachQueuedCount,
-  isShowingDemoFallback,
+  isBackendConnected,
   gmailStatusLabel,
 }) => {
   const cards = [
@@ -29,9 +29,9 @@ export const DashboardKPIGrid: React.FC<DashboardKPIGridProps> = ({
     <div>
       <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs font-medium text-[#6B7280]">
-          {isShowingDemoFallback
-            ? 'Illustrative Demo Data — run YouTube discovery on Influencers to load live profiles'
-            : 'Shared Workspace Metrics — backed by Supabase PostgreSQL'}
+          {isBackendConnected
+            ? 'Live Workspace Metrics — backed by Supabase PostgreSQL'
+            : 'Workspace Backend Disconnected — configure Supabase to view metrics'}
         </span>
         <span className="text-xs font-medium text-[#5B21B6]">
           {gmailStatusLabel}

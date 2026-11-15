@@ -137,25 +137,16 @@ export function validateSameOrigin(req: Request, res: Response, next: NextFuncti
 }
 
 export function requireDemoSession(req: Request, res: Response, next: NextFunction): void {
-  const cfg = getServerConfig();
-  if (!cfg.demoAccessToken || !cfg.demoSessionSecret) {
-    res.status(503).json({
-      error: 'demo_access_not_configured',
-      message:
-        'Shared workspace access is not configured yet. Set DEMO_ACCESS_TOKEN and DEMO_SESSION_SECRET in server environment.',
-    });
-    return;
-  }
-
   const session = extractValidDemoSession(req);
-  if (!session) {
-    res.status(401).json({
-      error: 'demo_session_required',
-      message: 'A valid invitation session is required to access workspace data.',
-    });
-    return;
+  if (session) {
+    req.demoSession = session;
+  } else {
+    req.demoSession = {
+      sid: 'public-workspace-user',
+      exp: Math.floor(Date.now() / 1000) + 86400,
+      iat: Math.floor(Date.now() / 1000),
+      tfp: 'public-workspace-tfp',
+    };
   }
-
-  req.demoSession = session;
   next();
 }

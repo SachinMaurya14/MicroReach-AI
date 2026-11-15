@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Search } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Search } from 'lucide-react';
 import { AIPitchStudio } from '../../components/ai-pitch-studio/AIPitchStudio';
 import { AppHeader } from '../../components/app-shell/AppHeader';
 import { AppSidebar } from '../../components/app-shell/AppSidebar';
@@ -23,6 +23,7 @@ export const DashboardPage: React.FC = () => {
     kpiMetrics,
     isBackendConnected,
     isShowingDemoFallback,
+    backendError,
     busyAction,
     selectedRowIds,
     activeCreator,
@@ -30,6 +31,8 @@ export const DashboardPage: React.FC = () => {
     setDrawerOpen,
     globalSearch,
     setGlobalSearch,
+    qualFilter,
+    setQualFilter,
     selectedCampaign,
     setSelectedCampaignId,
     demoNotice,
@@ -38,13 +41,23 @@ export const DashboardPage: React.FC = () => {
     toggleAllVisibleSelection,
     openPitchPreview,
     updateEmailDraft,
+    updateEmailSubject,
+    updateChannelDraft,
     saveEmailDraftToBackend,
+    saveChannelDraftToBackend,
+    rejectEmailDraft,
+    generateFollowUpForCreator,
+    generateChannelDraft,
     regenerateLocalDraft,
     simulateApproveOutreach,
     logManualInstagramDm,
+    logManualChannelStage,
+    setCreatorPreferredChannel,
     updateCreatorProfile,
     deleteCreatorRow,
     createNewCampaign,
+    handleExportCreatorsCsv,
+    handleExportOutreachCsv,
   } = useDashboardState();
 
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -103,6 +116,16 @@ export const DashboardPage: React.FC = () => {
               />
             </div>
 
+            {backendError && (
+              <div
+                role="alert"
+                className="flex items-center gap-2.5 rounded-xl border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-xs font-semibold text-[#991B1B]"
+              >
+                <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>{backendError}</span>
+              </div>
+            )}
+
             {demoNotice && (
               <div
                 role="status"
@@ -127,7 +150,7 @@ export const DashboardPage: React.FC = () => {
               qualifiedCount={kpiMetrics.qualifiedCount}
               enrichedCount={kpiMetrics.enrichedCount}
               outreachQueuedCount={kpiMetrics.outreachQueuedCount}
-              isShowingDemoFallback={isShowingDemoFallback}
+              isBackendConnected={isBackendConnected}
               gmailStatusLabel={gmailStatus.message}
             />
 
@@ -142,9 +165,13 @@ export const DashboardPage: React.FC = () => {
 
             <CreatorPipelineTable
               creators={filteredCreators}
+              totalCreatorCount={creators.length}
               selectedRowIds={selectedRowIds}
               activeCreatorId={activeCreator?.id ?? null}
-              isShowingDemoFallback={isShowingDemoFallback}
+              qualFilter={qualFilter}
+              onQualFilterChange={setQualFilter}
+              onExportCreatorsCsv={handleExportCreatorsCsv}
+              onExportOutreachCsv={handleExportOutreachCsv}
               onToggleSelectRow={toggleRowSelection}
               onToggleSelectAll={toggleAllVisibleSelection}
               onPreviewPitch={openPitchPreview}
@@ -162,9 +189,17 @@ export const DashboardPage: React.FC = () => {
             gmailConnected={gmailStatus.connected}
             onClose={() => setDrawerOpen(false)}
             onChangeEmailDraft={updateEmailDraft}
+            onChangeEmailSubject={updateEmailSubject}
+            onChangeChannelDraft={updateChannelDraft}
             onSaveEmailDraft={saveEmailDraftToBackend}
+            onSaveChannelDraft={saveChannelDraftToBackend}
+            onRejectEmailDraft={rejectEmailDraft}
+            onGenerateFollowUp={generateFollowUpForCreator}
+            onGenerateChannelDraft={generateChannelDraft}
             onRegenerateDraft={regenerateLocalDraft}
             onLogManualDm={logManualInstagramDm}
+            onLogManualChannel={logManualChannelStage}
+            onSetPreferredChannel={setCreatorPreferredChannel}
             onRequestApprove={() => setApprovalConfirmOpen(true)}
           />
         </div>

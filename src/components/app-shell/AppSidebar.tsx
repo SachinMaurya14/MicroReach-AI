@@ -207,7 +207,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
         <button
           type="button"
-          onClick={() => handleNavClick('/')}
+          onClick={() => handleNavClick('/dashboard')}
           className={`flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors cursor-pointer ${
             isDark
               ? 'text-[#DDD6FE]/85 hover:bg-white/10 hover:text-white'
@@ -215,7 +215,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           }`}
         >
           <ArrowLeft className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-          <span>Back to Landing Page</span>
+          <span>Back to Dashboard</span>
         </button>
       </div>
     </div>

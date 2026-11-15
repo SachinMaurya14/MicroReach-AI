@@ -1,0 +1,1187 @@
+# MICROREACH AI — FINAL PRODUCTION-LEVEL ENGINEERING AUDIT, GAP FIXING, DOCUMENTATION & ASSIGNMENT SUBMISSION
+
+## PROJECT CONTEXT
+
+Project: MicroReach AI  
+Project Type: Automated Micro-Influencer Discovery, Filtering, Enrichment and Personalized Outreach System.
+
+The application is substantially implemented. The current objective is to bring the project to a professionally engineered, submission-ready standard.
+
+This is not just a documentation-writing task.
+
+You must perform a thorough, evidence-based engineering audit of the existing repository, identify incomplete or weak areas, fix implementation-level problems where safely possible, prepare professional documentation, generate the actual submission artifacts, and verify the complete assignment against its original requirements.
+
+Think and work like a senior software engineer conducting a production-readiness review before an important academic project submission.
+
+The result should be a genuine, functional and maintainable software project — not merely a collection of features that appear complete in a report.
+
+---
+
+# CORE ENGINEERING INSTRUCTIONS — READ FIRST
+
+## 1. Perform a real repository-level audit
+
+Do not rely on previous AI-generated reports, claimed completion percentages, historical messages, or assumptions.
+
+Inspect the current repository and actual implementation.
+
+Read relevant source files, understand how components interact, trace important execution paths, inspect database integration, review API contracts, examine error handling, and verify existing functionality.
+
+Audit the actual implementation, not just filenames or comments.
+
+At minimum inspect:
+
+- README.md
+- package.json
+- .env.example
+- .gitignore
+- Frontend source
+- Backend source
+- Express routes and controllers
+- Service and provider layers
+- Database queries and types
+- Supabase configuration
+- Supabase migrations
+- Discovery workflows
+- Qualification and filtering logic
+- Profile enrichment logic
+- Gemini integration
+- Outreach generation and sending
+- Outreach logging and deduplication
+- CSV import/export
+- Existing tests and smoke tests
+- Deployment configuration
+- Existing submission documentation
+
+Follow the actual execution flow of important operations and identify whether each function is genuinely connected to the application.
+
+A function that exists but is not reachable from the UI or API must not be described as a completed feature.
+
+A button that does not perform its advertised action must not be considered functional.
+
+A fallback that silently replaces a failed database operation must not be treated as equivalent to successful database persistence.
+
+## 2. Use production-level engineering standards
+
+Review and improve the project using appropriate professional engineering practices.
+
+Pay particular attention to:
+
+- Strong TypeScript typing.
+- Clear module boundaries.
+- Separation of concerns.
+- Reusable services.
+- Input validation.
+- Output validation.
+- Safe API request handling.
+- Consistent error handling.
+- Predictable API response contracts.
+- Database integrity.
+- Unique constraints and deduplication.
+- Reliable asynchronous operations.
+- Idempotent operations.
+- Pagination and bounded processing.
+- API rate limits.
+- Retry and timeout strategies.
+- Logging and observability.
+- Environment configuration.
+- Secret management.
+- Data provenance.
+- CSV security.
+- Test coverage.
+- Build reliability.
+- Maintainability.
+- Performance and scalability.
+
+Do not introduce unnecessary architectural complexity.
+
+Prefer straightforward, maintainable implementations that solve the actual problem.
+
+Do not add decorative abstractions, unnecessary frameworks, excessive files, placeholder services, mock implementations, or speculative features.
+
+Use the existing architecture unless there is a concrete technical reason to improve it.
+
+## 3. Fix genuine gaps instead of only reporting them
+
+This is an audit-and-improvement task.
+
+When a genuine implementation gap is found:
+
+**A. If it can be fixed safely within the existing repository:**
+
+- Implement the missing functionality.
+- Use production-quality code.
+- Integrate it with the existing architecture.
+- Add suitable validation and error handling.
+- Add or update tests.
+- Run regression checks.
+- Verify that the implementation actually works.
+
+**B. If a feature is partially implemented:**
+
+- Identify the incomplete execution path.
+- Complete it without unnecessarily rewriting working code.
+- Preserve the established API contracts and UI behavior.
+- Add tests for the repaired behavior.
+
+**C. If an issue requires an external action:**
+
+Examples:
+
+- Supabase SQL migration execution.
+- Production environment configuration.
+- API key or OAuth setup.
+- Provider account permissions.
+- Vercel deployment configuration.
+- Google/Gmail authorization.
+- External platform approval.
+
+Do not pretend to complete that action.
+
+Instead, report:
+
+1. Exact problem.
+2. Why it is blocking.
+3. Required action from me.
+4. Exact command, SQL or configuration step.
+5. How I can verify successful completion.
+
+**D. If a requirement cannot be implemented safely or legally:**
+
+Explain the limitation and provide a compliant alternative.
+
+Never bypass platform restrictions.
+
+## 4. Code quality must be genuine, not cosmetic
+
+Do not just make code compile by suppressing errors.
+
+Avoid:
+
+- `any` without a valid reason.
+- Empty catch blocks.
+- Swallowed exceptions.
+- Hardcoded success responses.
+- Fake API responses.
+- Fake database persistence.
+- Placeholder data presented as real data.
+- Disabled tests that previously failed.
+- Excessive use of optional chaining to hide invalid state.
+- Arbitrary timeout increases.
+- Removing validation to make requests succeed.
+- Ignoring TypeScript errors.
+- Unnecessary `@ts-ignore`.
+- Duplicated business logic.
+- Unbounded loops or API calls.
+- Infinite retries.
+- Logging API secrets or personal data.
+- Reporting an operation successful before it completes.
+
+Use specific error types, meaningful logs, bounded retries and reliable failure handling.
+
+Do not overengineer. Implement only what the project genuinely requires.
+
+## 5. Preserve the existing product UI
+
+The existing MicroReach AI interface is already designed.
+
+Do not redesign it.
+
+Do not arbitrarily modify:
+
+- Page layouts.
+- Navigation.
+- Sidebar.
+- Typography.
+- Colors.
+- Spacing.
+- Existing component appearance.
+- Landing page.
+- Dashboard structure.
+- Existing user workflows.
+
+Only make UI changes when an existing feature is broken or the assignment genuinely requires a missing interaction.
+
+Any necessary UI correction must preserve the established visual system.
+
+Do not add login, password, invite-link, access-token or other authorization gates to the owner dashboard as part of this task.
+
+Do not introduce unrelated authentication changes.
+
+## 6. Keep external operations safe
+
+- Keep `OUTREACH_MODE=simulation` as the default.
+- Do not send real emails.
+- Do not send real Instagram DMs.
+- Do not send real LinkedIn messages.
+- Do not contact creators.
+- Do not deploy.
+- Do not push to GitHub.
+- Do not execute destructive SQL.
+- Do not expose credentials.
+- Do not overwrite production data.
+- Do not change live provider settings.
+
+You may run safe local tests and read-only database checks.
+
+For any action that could create an external side effect, stop and report the required approval.
+
+## 7. Write documentation like a real engineering team
+
+Documentation must be natural, clear, technically precise and professionally written.
+
+Avoid generic AI-generated language, repetitive introductions, exaggerated marketing claims, unnecessary adjectives and vague statements such as:
+
+- "Robust and scalable architecture."
+- "Seamless end-to-end integration."
+- "Revolutionary AI-powered solution."
+- "Enterprise-grade implementation."
+
+Explain what the actual system does, how it works, what technologies it uses and where its limitations are.
+
+Use concrete implementation details, actual file paths, real API routes, database tables and verified behavior.
+
+Do not document intended functionality as if it already exists.
+
+---
+
+# PART 1 — COMPLETE PROJECT AND ASSIGNMENT AUDIT
+
+Compare the current implementation against all ten sections of the original assignment:
+
+1. Influencer Discovery.
+2. Filtering & Classification.
+3. Profile Enrichment.
+4. Message Personalization.
+5. Sending Layer.
+6. Suggested Workflow.
+7. Expected Output.
+8. Technical Expectations.
+9. Evaluation Criteria.
+10. Submission Requirements.
+
+For every requirement, identify:
+
+- Expected behavior.
+- Actual implementation.
+- Relevant source files.
+- API endpoint or database table.
+- How it is invoked.
+- How it was tested.
+- Actual evidence.
+- Missing functionality.
+- Required correction.
+- Final status: PASS / PARTIAL / BLOCKED / NOT VERIFIED.
+
+Do not mark a requirement PASS merely because a source file exists.
+
+Inspect the complete execution path wherever possible:
+
+UI → API → Controller → Service → Provider / Database → Result → UI.
+
+Create:
+
+`submission/FINAL_ENGINEERING_AUDIT.md`
+
+Include an executive summary, detailed findings, severity, fixes performed and remaining blockers.
+
+Classify issues as:
+
+- CRITICAL — security, data integrity or major workflow failure.
+- HIGH — important assignment requirement is broken.
+- MEDIUM — incomplete functionality or reliability weakness.
+- LOW — documentation, maintainability or minor polish.
+
+Fix issues in priority order where safe.
+
+---
+
+# PART 2 — FINALIZE AND IMPROVE README.md
+
+Inspect the actual README and make it a complete developer-facing project guide.
+
+Keep accurate existing information. Remove unsupported claims and outdated instructions.
+
+Include the following sections.
+
+## 2.1 Project Overview
+
+Project name: MicroReach AI.
+
+Objective:
+
+An AI-powered system that discovers relevant micro-influencers, filters and classifies them, enriches their profiles, generates personalized collaboration messages and manages an outreach workflow.
+
+Describe the actual workflow.
+
+## 2.2 Features
+
+Verify each feature before documenting it:
+
+- YouTube Data API v3 discovery.
+- Instagram discovery through Apify.
+- Multi-query discovery.
+- Profile normalization.
+- Creator deduplication.
+- PASS / FAIL / REVIEW_REQUIRED classification.
+- Follower-count filtering.
+- Engagement evaluation.
+- Geography verification.
+- Brand-fit evaluation.
+- Content relevance.
+- Public business email extraction.
+- Website and content-theme extraction.
+- Not Found handling.
+- Gemini email personalization.
+- Instagram DM personalization.
+- LinkedIn outreach drafts, where supported.
+- YouTube business-contact messages.
+- Message review and approval.
+- Email simulation.
+- Controlled sending mechanism.
+- Manual social outreach.
+- Duplicate outreach prevention.
+- Outreach history and logs.
+- Campaign management.
+- Content ideas.
+- Creator incentives.
+- Tasks and follow-ups.
+- Reports and analytics.
+- CSV exports.
+
+Only list capabilities that are implemented and appropriately verified.
+
+## 2.3 Technology Stack
+
+Read the actual dependency files and source code.
+
+Document:
+
+- Frontend framework.
+- Programming language.
+- Build system.
+- UI libraries.
+- Backend framework.
+- Database.
+- Provider APIs.
+- AI model.
+- OAuth integrations.
+- Testing framework.
+- Deployment platform.
+
+Use real package versions where possible.
+
+Do not guess versions or model identifiers.
+
+## 2.4 System Architecture
+
+Explain the actual system architecture.
+
+Include a Mermaid diagram.
+
+Example structure, to be adjusted according to the real implementation:
+
+Frontend → Express API → Provider Services → Qualification → Enrichment → Gemini → Supabase → Outreach.
+
+Explain responsibilities of each important module.
+
+## 2.5 Discovery Methodology
+
+Document YouTube and Instagram separately.
+
+Explain:
+
+- Query generation.
+- Search methodology.
+- Data source.
+- API calls or Apify actor.
+- Pagination and batching.
+- Rate limits.
+- Profile normalization.
+- URL canonicalization.
+- Deduplication strategy.
+- Engagement calculation.
+- Geography confidence.
+- Qualification rules.
+- PASS / FAIL / REVIEW_REQUIRED.
+- Rejection reasons.
+
+Use the actual formulas and thresholds found in the source code.
+
+## 2.6 Enrichment Methodology
+
+Explain:
+
+- Public profile data extraction.
+- Public business email discovery.
+- Website extraction.
+- Contact source.
+- Content-theme extraction.
+- Missing email representation.
+- Data provenance.
+- Email syntax validation.
+- Email deliverability limitations.
+- Unavailable audience demographic information.
+- Privacy and scraping boundaries.
+
+## 2.7 AI Personalization
+
+Document the real Gemini integration.
+
+Include:
+
+- Actual model identifier.
+- Prompt structure.
+- Creator context.
+- Campaign context.
+- Content relevance.
+- Personalization safeguards.
+- Output validation.
+- Word-count enforcement.
+- Fallback behavior.
+- Persistence process.
+
+Required message lengths:
+
+| Message | Required length |
+|---|---:|
+| Email | 60–90 words |
+| Instagram DM | 15–30 words |
+| LinkedIn | 20–75 words |
+| YouTube contact pitch | 30–90 words |
+
+Document only channels the system genuinely supports.
+
+## 2.8 Sending Workflow
+
+Explain:
+
+- Gmail integration.
+- Simulation mode.
+- Email approval.
+- Manual Instagram workflow.
+- Manual LinkedIn workflow.
+- YouTube business contact.
+- Idempotency.
+- Duplicate prevention.
+- Sending logs.
+- Delivery status.
+- Failure status.
+- Platform restrictions.
+
+Explicitly document that final verification uses `OUTREACH_MODE=simulation` and that no real messages are sent during the audit.
+
+## 2.9 Installation and Setup
+
+Use the actual commands supported by package.json.
+
+Include:
+
+- Prerequisites.
+- Installation.
+- Local development.
+- Environment configuration.
+- Supabase project setup.
+- Migration execution.
+- API key configuration.
+- OAuth setup, if required.
+- Tests.
+- Lint.
+- Type checking.
+- Build.
+- Deployment configuration.
+
+Document environment variable names without exposing values.
+
+Never include `.env.local` contents or private credentials.
+
+## 2.10 Limitations
+
+Explain real limitations:
+
+- Missing public business emails.
+- Unavailable audience analytics.
+- Unavailable engagement values.
+- Provider API rate limits.
+- Scraper timeouts.
+- Platform access restrictions.
+- Manual social messaging.
+- YouTube contact limitations.
+- Database migration requirements.
+- Production environment dependencies.
+
+---
+
+# PART 3 — INFLUENCER DATASET EXPORT AND VALIDATION
+
+The assignment requires at least 50 genuine discovered influencers.
+
+The latest historical report claimed 114 records. This number must not be assumed to represent the current database.
+
+Inspect the actual current database and export the genuine records.
+
+Create:
+
+`submission/datasets/influencer_dataset.csv`
+
+Include:
+
+- Influencer Name.
+- Platform.
+- Profile URL.
+- Followers.
+- Engagement Rate.
+- Category / Niche.
+- Content Themes.
+- Contact Email.
+- Website.
+- Geography Status.
+- Qualification Status.
+- Brand Fit Score.
+- Rejection / Review Reason.
+- Enrichment Status.
+- Discovery Source.
+- Discovery Run ID.
+- Last Updated.
+
+Requirements:
+
+1. Use genuine stored records.
+2. Export all discovered creators, not just qualified creators.
+3. Include all available platforms.
+4. Preserve PASS, FAIL and REVIEW_REQUIRED.
+5. Use `Not Found` for a missing public email.
+6. Use `Unavailable` when engagement data cannot be established.
+7. Never invent missing information.
+8. Normalize profile URLs carefully.
+9. Deduplicate canonical profile URLs.
+10. Preserve source provenance.
+11. Protect against CSV formula injection.
+12. Validate encoding and CSV escaping.
+13. Confirm actual export row count.
+14. Confirm unique profile count.
+15. Compare exported values with database read-back.
+
+If there are fewer than 50 unique genuine records, report the exact number and explain the gap.
+
+Do not generate fake data to satisfy the assignment.
+
+Create:
+
+`submission/datasets/DATASET_SUMMARY.md`
+
+Include actual snapshot values:
+
+- Total records.
+- Unique creators.
+- YouTube count.
+- Instagram count.
+- Other platform counts, if present.
+- Duplicate count.
+- Qualified count.
+- Rejected count.
+- Review-required count.
+- Public emails found.
+- Emails marked Not Found.
+- Unavailable engagement records.
+- Latest discovery run identifiers.
+
+Clearly distinguish historical numbers from current export values.
+
+---
+
+# PART 4 — PERSONALIZED MESSAGE EVIDENCE
+
+Create:
+
+`submission/examples/personalized_messages.md`
+
+Retrieve actual persisted messages.
+
+Use real messages generated for actual creators.
+
+For each sample include:
+
+- Creator name.
+- Platform.
+- Campaign.
+- Personalization signals.
+- Message channel.
+- Actual generated message.
+- Word count.
+- Model identifier.
+- Message ID.
+- Creation timestamp.
+- Approval status.
+
+Verify word counts:
+
+- Email: 60–90.
+- Instagram DM: 15–30.
+- LinkedIn: 20–75.
+- YouTube contact pitch: 30–90.
+
+Do not manually rewrite messages and label them as AI-generated.
+
+Clearly identify manually entered messages separately.
+
+Verify message content against the actual persisted record.
+
+For a missing channel, report it as unavailable instead of generating fake evidence.
+
+Do not expose unnecessary private contact information.
+
+---
+
+# PART 5 — OUTREACH TRACKER EXPORT
+
+Create:
+
+`submission/datasets/outreach_tracker.csv`
+
+Include:
+
+- Influencer.
+- Platform.
+- Campaign.
+- Contact Channel.
+- Public Business Email, if applicable.
+- Message ID.
+- Message Generated.
+- Approval Status.
+- Sending Method.
+- Simulation / Live Mode.
+- Sent Status.
+- Created Date.
+- Sent Date, if confirmed.
+- Provider Message ID, if available.
+- Failure Reason.
+
+Use actual stored outreach records.
+
+Clearly distinguish:
+
+- Draft generated.
+- Awaiting review.
+- Approved.
+- Ready for manual sending.
+- Simulated email.
+- Actually sent email.
+- Manually sent DM.
+- Failed.
+- Duplicate blocked.
+
+Never mark a message sent just because it was opened, copied or approved.
+
+Compare the CSV against database read-back.
+
+Create:
+
+`submission/datasets/OUTREACH_SUMMARY.md`
+
+Report actual counts for all sending and approval states.
+
+---
+
+# PART 6 — TECHNICAL DOCUMENTATION
+
+Create these files:
+
+`submission/docs/ARCHITECTURE.md`
+
+`submission/docs/API_AND_INTEGRATIONS.md`
+
+`submission/docs/DISCOVERY_AND_FILTERING.md`
+
+`submission/docs/ENRICHMENT_AND_PERSONALIZATION.md`
+
+`submission/docs/SENDING_AND_TRACKING.md`
+
+Documentation must reflect actual source code and behavior.
+
+Include:
+
+- Real module responsibilities.
+- Actual API endpoints.
+- Request and response behavior.
+- Provider dependencies.
+- Database tables.
+- Important constraints.
+- Failure behavior.
+- Authentication/integration details where applicable.
+- Security controls.
+- Data flow.
+
+Include this workflow where supported:
+
+Discovery  
+→ Normalization  
+→ Deduplication  
+→ Qualification  
+→ Enrichment  
+→ Gemini Personalization  
+→ Review  
+→ Approval  
+→ Simulation / Manual / Authorized Sending  
+→ Outreach Logs  
+→ Reports
+
+Do not document non-existent endpoints or fictional database tables.
+
+---
+
+# PART 7 — ACTUAL DEMO AND SCREENSHOT PREPARATION
+
+Create:
+
+`submission/DEMO_SCRIPT.md`
+
+Prepare a practical 5–7 minute screen-recording plan.
+
+Cover:
+
+1. Landing page and dashboard.
+2. Campaign selection.
+3. YouTube discovery.
+4. Instagram discovery.
+5. Influencer filtering.
+6. PASS / FAIL / REVIEW_REQUIRED.
+7. Profile enrichment.
+8. Public email source.
+9. Gemini email generation.
+10. Instagram DM generation.
+11. LinkedIn availability and workflow.
+12. Message approval.
+13. Simulation or manual sending.
+14. Outreach logs.
+15. Reports and CSV export.
+
+Use actual application routes and navigation.
+
+Prepare a screenshot checklist:
+
+- Dashboard.
+- Discovery results.
+- Influencer profile.
+- Qualification result.
+- Enrichment details.
+- Email message.
+- Instagram DM.
+- LinkedIn workflow.
+- Outreach tracker.
+- Reports.
+
+Only use screenshots from the running application.
+
+If screenshot capture is available in the environment, capture actual screens.
+
+If unavailable, create precise capture instructions and report screenshots as pending.
+
+Never generate fake interface screenshots or synthetic evidence.
+
+---
+
+# PART 8 — GITHUB, SECRETS AND SUBMISSION PACKAGE
+
+Inspect:
+
+- Git branch.
+- Git status.
+- Latest commit.
+- Remote configuration.
+- Ahead/behind status.
+- Tracked source files.
+- `.gitignore`.
+- Environment files.
+- Migration files.
+- Tests.
+- Documentation.
+
+Check that:
+
+- `.env.local` is not committed.
+- Private credentials are not present in tracked files.
+- API secrets are not printed in logs.
+- Temporary database dumps are excluded.
+- No unnecessary build artifacts are included.
+- Required source files exist.
+- README is accurate.
+- Migration files are documented.
+
+Do not commit or push without explicit approval.
+
+Create:
+
+`MicroReach_AI_Assignment_Submission.zip`
+
+Include:
+
+- README.
+- Submission documentation.
+- Influencer CSV.
+- Outreach tracker CSV.
+- Personalized message samples.
+- Architecture and API documentation.
+- Demo script.
+- Final checklist.
+
+Exclude:
+
+- `.env.local`.
+- Secret files.
+- Private keys.
+- `node_modules`.
+- Temporary logs.
+- Build caches.
+- Unnecessary binaries.
+
+Verify ZIP contents and integrity.
+
+---
+
+# PART 9 — FINAL ASSIGNMENT REQUIREMENT MATRIX
+
+Create:
+
+`submission/FINAL_ASSIGNMENT_CHECKLIST.md`
+
+Review all ten original assignment sections.
+
+Include:
+
+| Requirement | Implementation | Evidence | Verification | Remaining Gap |
+|---|---|---|---|---|
+
+Verify specifically:
+
+A. Working System.  
+B. 50+ genuine influencer dataset.  
+C. Personalized email and Instagram DM.  
+D. Outreach Tracker.  
+E. README documentation.  
+F. Technology stack.  
+G. APIs and tools.  
+H. Discovery methodology.  
+I. Filtering logic.  
+J. Profile enrichment.  
+K. AI model and prompts.  
+L. Sending mechanism.  
+M. Setup instructions.  
+N. Automation workflow.  
+O. GitHub repository.  
+P. Screenshots and demo video.
+
+Do not mark these items complete solely because their documentation exists.
+
+---
+
+# PART 10 — FINAL TECHNICAL VERIFICATION AND GAP FIXING
+
+Run the commands supported by the repository:
+
+- `npm test`
+- `npm run lint`
+- `npx tsc --noEmit`, if supported.
+- `npm run build`
+- Existing smoke tests.
+
+Inspect package.json scripts before running commands.
+
+Do not assume a command exists.
+
+For each check, capture:
+
+- Exact command.
+- Exit status.
+- Relevant output.
+- Failure explanation.
+- Fix performed, if applicable.
+
+Also verify:
+
+1. API response contracts.
+2. Provider-specific error handling.
+3. Database persistence.
+4. Database read-back.
+5. Unique creator counts.
+6. Profile URL deduplication.
+7. Qualification logic.
+8. Enrichment handling.
+9. Gemini output validation.
+10. Message word counts.
+11. Message persistence.
+12. Outreach idempotency.
+13. Outreach log consistency.
+14. CSV export correctness.
+15. CSV injection protection.
+16. Simulation mode.
+17. Zero external messages sent during testing.
+18. Migration availability and actual application status.
+19. Environment configuration requirements.
+20. Build and runtime compatibility.
+
+### Database and migrations
+
+Inspect migrations 001, 002, 003, 004 and any later migrations actually present.
+
+Verify whether expected tables, columns, indexes, constraints and database functions exist.
+
+Do not treat a migration file as proof that the migration has run.
+
+Do not treat fallback persistence as equivalent to actual schema support.
+
+If the database cannot be accessed, mark the relevant checks BLOCKED and provide the exact SQL or verification query I need to execute.
+
+Do not perform destructive operations.
+
+### Production configuration
+
+Distinguish between:
+
+- Local `.env.local`.
+- Preview deployment environment.
+- Production deployment environment.
+
+Never claim production credentials are configured because local environment variables exist.
+
+Do not expose or print actual secret values.
+
+### Current campaign criteria
+
+Verify the actual active campaign configuration.
+
+Do not weaken follower thresholds, engagement thresholds, niche requirements or geography requirements just to increase the qualified count.
+
+Preserve the existing campaign rules.
+
+### Testing integrity
+
+Do not change expected test outcomes simply to achieve a passing test suite.
+
+If a test reveals a real bug, fix the underlying implementation and add regression coverage.
+
+If a test is obsolete, explain why before changing it.
+
+---
+
+# PART 11 — SECURITY, DATA QUALITY AND RELIABILITY REVIEW
+
+Perform an additional focused audit.
+
+## Security
+
+Inspect:
+
+- Server-side secret handling.
+- Frontend exposure.
+- CORS configuration.
+- Input validation.
+- URL fetching and SSRF risks.
+- SQL injection protection.
+- CSV formula injection.
+- OAuth token handling.
+- Credential encryption.
+- Sensitive log output.
+- Error response leakage.
+- Dependency vulnerabilities, where safe local tooling supports the check.
+
+Do not introduce new authentication gates into the owner dashboard.
+
+Do not remove necessary provider-side security protections.
+
+## Data quality
+
+Inspect:
+
+- Duplicate influencer profiles.
+- Incorrect platform mapping.
+- Invalid URLs.
+- Invalid follower counts.
+- Missing engagement data.
+- Unverified geography.
+- Unsupported niche labels.
+- Guessed emails.
+- Invalid content themes.
+- Stale discovery records.
+- AI-generated claims without source signals.
+
+Use clear evidence and confidence levels.
+
+Do not silently convert uncertainty into verified facts.
+
+## Reliability and scalability
+
+Inspect:
+
+- API pagination.
+- Concurrent requests.
+- Provider throttling.
+- Timeouts.
+- Retry policies.
+- Partial failures.
+- Resumable discovery.
+- Database batch operations.
+- Duplicate handling.
+- Large CSV exports.
+- Long-running jobs.
+- Memory usage where applicable.
+
+Identify whether the current system can reasonably scale from 50 to 500+ creators.
+
+Do not claim scalability without evidence.
+
+Implement practical improvements when they are clearly needed and safe.
+
+---
+
+# PART 12 — CHANGE MANAGEMENT AND REGRESSION PROTECTION
+
+Before modifying files:
+
+1. Inspect the existing implementation.
+2. Identify the exact gap.
+3. Determine the minimum safe change.
+4. Identify affected files and workflows.
+5. Preserve existing working behavior.
+
+For every code fix:
+
+- Explain the problem.
+- List changed files.
+- Describe the correction.
+- Add/update relevant tests.
+- Run targeted tests.
+- Run broader regression checks.
+
+Do not overwrite working implementation without a technical reason.
+
+Do not refactor unrelated modules.
+
+Do not change the established UI design.
+
+Do not delete features to make the project appear simpler.
+
+Do not deploy, push, send messages or perform destructive database actions.
+
+---
+
+# PART 13 — FINAL SUBMISSION REPORT
+
+Create:
+
+`submission/FINAL_SUBMISSION_REPORT.md`
+
+Include:
+
+## A. Engineering Audit
+
+- Critical issues found.
+- High issues found.
+- Medium issues found.
+- Low issues found.
+- Issues fixed.
+- Issues remaining.
+
+## B. Implementation Changes
+
+- Exact files modified.
+- New files created.
+- Existing behavior preserved.
+- Tests added or updated.
+
+## C. Dataset Evidence
+
+- Actual influencer export row count.
+- Unique creator count.
+- Platform breakdown.
+- Qualified / rejected / review-required counts.
+- Public email counts.
+- Actual latest discovery run IDs.
+
+## D. Personalization Evidence
+
+- Actual persisted message sample count.
+- Messages by channel.
+- Word-count verification.
+- Model identifier.
+- Persistence verification.
+
+## E. Outreach Evidence
+
+- Actual tracker row count.
+- Simulation count.
+- Live send count.
+- Manual send count.
+- Failed send count.
+- Duplicate prevention evidence.
+
+## F. Database and Deployment
+
+- Migration file status.
+- Actual migration execution status.
+- Required external configuration.
+- Local versus production environment status.
+
+## G. Project Files
+
+- README status.
+- Documentation status.
+- Dataset status.
+- Tracker status.
+- Demo script status.
+- Screenshots status.
+- ZIP package status.
+
+## H. GitHub
+
+- Current branch.
+- Latest commit.
+- Working tree status.
+- Remote synchronization status.
+- Whether commit/push is pending.
+
+## I. Test Results
+
+List exact test commands and results.
+
+## J. Remaining Manual Actions
+
+Give precise instructions for anything requiring my access or approval.
+
+## K. Final Verdict
+
+Choose exactly one:
+
+- READY TO SUBMIT.
+- READY AFTER MANUAL SCREENSHOT/VIDEO.
+- READY AFTER DATABASE/PRODUCTION FIX.
+- NOT READY.
+
+The verdict must reflect actual evidence, not confidence or estimated completion percentage.
+
+---
+
+# FINAL EXECUTION RULES
+
+1. Begin with repository inspection, not documentation generation.
+2. Audit actual implementation before making claims.
+3. Fix repository-level gaps when they can be safely fixed.
+4. Write missing code when required by the assignment and clearly within scope.
+5. Do not merely list fixable issues as recommendations.
+6. Do not pretend to perform actions that require external access.
+7. Report blockers with exact steps for me.
+8. Do not fabricate influencer data, emails, engagement metrics, message samples, test results or screenshots.
+9. Do not weaken campaign criteria to manufacture qualified creators.
+10. Do not introduce fake fallback success.
+11. Do not redesign the UI.
+12. Do not introduce dashboard authentication gates.
+13. Do not send real outreach.
+14. Do not deploy or push.
+15. Keep secrets private.
+16. Keep implementation maintainable and testable.
+17. Keep documentation natural, specific and technically accurate.
+18. Do not stop after writing the audit report: complete all safe fixes and generate all possible submission artifacts.
+19. If execution is interrupted, clearly report which files and changes were actually completed.
+20. Never claim a task is complete without verifiable evidence.
+
+**The final objective is to deliver a genuinely working, professionally engineered, well-documented MicroReach AI project that satisfies the original assignment and can be confidently demonstrated and submitted.**

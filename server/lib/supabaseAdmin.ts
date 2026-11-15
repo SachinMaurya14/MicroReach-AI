@@ -16,10 +16,8 @@ export function getSupabaseAdmin(): SupabaseClient<Database> | null {
     return null;
   }
 
-  // Reject accidentally passed publishable/anon keys on admin client
-  if (cfg.supabaseSecretKey.startsWith('sb_publishable_')) {
-    return null;
-  }
+  // Allow publishable key if no dedicated service role key is provided
+  const isPublishable = cfg.supabaseSecretKey.startsWith('sb_publishable_') || cfg.supabaseSecretKey.startsWith('eyJ');
 
   const signature = `${cfg.supabaseUrl}:${cfg.supabaseSecretKey.slice(0, 12)}`;
   if (cachedAdminClient && cachedSignature === signature) {

@@ -1,0 +1,2151 @@
+# MICROREACH AI — COMPLETE PRODUCTION IMPLEMENTATION MASTER PROMPT
+## Existing Application Stabilization + Full Influencer Discovery, Enrichment, AI Personalization, Outreach, Campaign Management and Analytics
+
+You are working on the EXISTING MicroReach AI application.
+
+Your task is to inspect, stabilize, fix, and complete the existing application into a fully functional, production-oriented Automated Micro-Influencer Outreach System.
+
+This is not a request to create a new application, redesign the dashboard, replace the existing UI, or build a simplified demo.
+
+You must work on the existing codebase, existing architecture, existing database, existing integrations, and existing application screens.
+
+You have permission to inspect the full project, identify problems, edit the necessary source files, create additive database migrations, implement backend and frontend functionality, and run verification tests.
+
+**Do not stop after identifying problems. Diagnose them, implement the appropriate fixes, and continue with the complete implementation.**
+
+---
+
+# 0. ABSOLUTE PROJECT RULES — READ BEFORE IMPLEMENTING
+
+These rules apply to every phase.
+
+## A. Preserve the existing UI completely
+
+The existing MicroReach AI interface has already been designed.
+
+I do NOT want a new UI design.
+
+Preserve:
+
+- Existing public landing page.
+- Existing dashboard design.
+- Existing colors and gradients.
+- Existing fonts and typography.
+- Existing spacing and sizing.
+- Existing sidebar.
+- Existing header.
+- Existing navigation.
+- Existing cards.
+- Existing buttons.
+- Existing tables.
+- Existing filters.
+- Existing forms.
+- Existing responsive behavior.
+- Existing component hierarchy.
+- Existing page layouts.
+- Existing visual identity and branding.
+
+Do not replace existing designs with generic dashboard templates.
+
+Do not introduce a different design system.
+
+Do not globally modify CSS, Tailwind configuration, design tokens, typography, spacing, or component styling.
+
+Do not rewrite the application shell.
+
+Do not redesign the Influencers page.
+
+Do not redesign the Campaigns, Content, Incentives, Messages, Reports, Tasks, Settings, Administration, or Help pages.
+
+### How to add new functionality without redesigning
+
+1. Inspect the existing component structure first.
+2. Reuse existing components and styling patterns.
+3. Reuse existing tables, cards, buttons, modals, tabs, dropdowns, and forms.
+4. Connect existing buttons to actual backend functionality.
+5. Replace existing "Coming Soon" content with functional content inside the existing page structure.
+6. Add only the minimum new controls required by a feature.
+7. Keep all new elements visually consistent with the existing design.
+8. Avoid changing unrelated components.
+
+The objective is to extend the existing UI, not replace it.
+
+If a functionality can be implemented by connecting an existing button to an API, do that instead of creating a new visual component.
+
+Do not change the landing page content or appearance. Its existing CTA buttons may have their click actions corrected where required, but their appearance and text must remain unchanged.
+
+## B. Preserve the existing technology stack
+
+Inspect the actual repository before coding.
+
+The known architecture includes:
+
+- React
+- TypeScript
+- Vite
+- Express
+- Supabase PostgreSQL
+- YouTube Data API v3
+- Apify Instagram Search Scraper
+- Gemini API
+- Gmail OAuth / Gmail API
+- Vercel deployment
+
+Use the existing stack.
+
+Do not introduce an unnecessary framework, database, backend service, or alternative architecture.
+
+Reuse existing repositories, services, API clients, validation utilities, environment configuration, hooks, and components wherever possible.
+
+## C. Real data only
+
+This project is evaluated on actual engineering functionality.
+
+Never use:
+
+- Hardcoded influencer records.
+- Fake Instagram accounts.
+- Fake YouTube channels.
+- Generated email addresses presented as real.
+- Fabricated follower counts.
+- Fabricated engagement percentages.
+- Mock API responses in production workflows.
+- Hardcoded analytics presented as actual statistics.
+- Fake outreach activity.
+- Fake successful database writes.
+
+All production results must originate from real platform API responses, genuine database records, or explicitly user-provided information.
+
+Where information is unavailable, use:
+
+- `Not Found`
+- `Not Available`
+- `Unknown`
+- `Not Verified`
+
+Clearly distinguish real API execution, local tests, and mocked unit tests.
+
+## D. Safety and outreach rules
+
+Keep:
+
+`OUTREACH_MODE=simulation`
+
+as the default.
+
+Never send real emails or Instagram DMs during implementation tests.
+
+Real email sending must require an explicit user action and an individually approved message.
+
+Instagram DM should use an approved/manual workflow unless an authorized official API and required permissions genuinely support automated sending.
+
+Never bypass Instagram or Meta platform restrictions.
+
+Do not expose API credentials, Supabase secret keys, OAuth tokens, refresh tokens, or encryption keys to frontend code.
+
+---
+
+# PART 1 — FIRST AUDIT THE EXISTING APPLICATION AND RESOLVE ALL EXISTING PROBLEMS
+
+This is the first mandatory stage.
+
+Before adding new functionality, perform a detailed audit of the current application.
+
+Do not immediately begin adding features without understanding why the existing features are failing.
+
+## 1.1 Inspect the entire project
+
+Inspect the following areas:
+
+- `package.json`
+- Application entry points.
+- React routing.
+- Dashboard application shell.
+- Sidebar and header.
+- All dashboard pages.
+- All existing hooks.
+- All API service clients.
+- Express application setup.
+- Express middleware.
+- API routes.
+- Environment configuration.
+- Supabase client initialization.
+- Database repositories.
+- Database migrations.
+- YouTube discovery service.
+- Instagram Apify discovery service.
+- Email enrichment service.
+- Qualification service.
+- Gemini pitch-generation service.
+- Outreach service.
+- Gmail OAuth integration.
+- API error-handling middleware.
+- Existing tests.
+- Existing documentation.
+
+Also inspect existing Git changes before editing. Do not overwrite unrelated or uncommitted work.
+
+Create an internal dependency map of the application so that changes in one area do not accidentally break another.
+
+## 1.2 Fix the previous Gmail OAuth error
+
+The application previously displayed:
+
+`Too many Gmail OAuth callback attempts`
+
+This appeared while working with Influencer Discovery, even though YouTube and Instagram discovery are separate integrations.
+
+Investigate why.
+
+Check:
+
+- Whether Gmail OAuth callback rate limiting is incorrectly applied globally.
+- Whether OAuth callback middleware is shared with discovery routes.
+- Whether discovery requests accidentally invoke Gmail OAuth validation.
+- Whether an error handler incorrectly returns a Gmail OAuth error for unrelated APIs.
+- Whether callback retries are accidentally triggered by frontend effects.
+- Whether the OAuth callback can execute multiple times for one authorization attempt.
+- Whether a stale OAuth state or callback URL is causing repeated requests.
+
+### Required behavior
+
+Gmail OAuth must remain isolated.
+
+These operations must not depend on a Gmail OAuth callback:
+
+- YouTube creator discovery.
+- Instagram creator discovery.
+- Supabase reads and writes.
+- Influencer qualification.
+- Profile enrichment.
+- Gemini message generation.
+- Dashboard initialization.
+
+Only Gmail connection and Gmail sending-related operations should depend on the Gmail connection state.
+
+A failed Gmail OAuth connection must never prevent creator discovery.
+
+Use separate, accurate error handling for each provider.
+
+Do not hide actual API failures behind generic Gmail error messages.
+
+## 1.3 Fix the Supabase configuration and connectivity problem
+
+The previous error was:
+
+`Supabase server backend requires configuration before running live discovery.`
+
+Other observed errors included:
+
+`Supabase workspace backend disconnected — verify configuration`
+
+And:
+
+`A valid invitation session is required to access workspace data.`
+
+Investigate the exact root cause.
+
+Check the entire chain:
+
+1. Environment variables.
+2. Server configuration parser.
+3. Supabase server client.
+4. Service-role/secret-key initialization.
+5. API middleware.
+6. Discovery routes.
+7. Database repositories.
+8. Database schema.
+9. Database constraints.
+10. Frontend API error handling.
+
+### Environment variable compatibility
+
+Inspect which names are actually used by the code.
+
+Known environment names may include:
+
+- `SUPABASE_URL`
+- `SUPABASE_SECRET_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `YOUTUBE_API_KEY`
+- `APIFY_TOKEN`
+- `APIFY_API_TOKEN`
+- `GEMINI_API_KEY`
+- `GEMINI_MODEL`
+- `OUTREACH_MODE`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_REDIRECT_URI`
+- `INTEGRATION_ENCRYPTION_KEY`
+- `APP_URL`
+
+Support the existing canonical names and intentional aliases consistently.
+
+Do not create a situation where the health endpoint accepts one variable name but the actual discovery service expects another.
+
+Never print actual environment variable values into logs or reports.
+
+It is acceptable to report:
+
+- Configured.
+- Missing.
+- Invalid format.
+- Connection failed.
+- Database query failed.
+
+Do not expose credentials.
+
+### Supabase connection verification
+
+The health endpoint must verify actual server-side database connectivity, not merely check whether an environment variable is non-empty.
+
+Use a lightweight read-only query against an existing safe table.
+
+Report separately:
+
+- `supabaseConfigured`
+- `supabaseReachable`
+- `databaseSchemaCompatible`
+
+Avoid treating these three statuses as equivalent.
+
+If a required table or column is missing, return a clear schema compatibility error.
+
+Do not fabricate a successful health result.
+
+### Previous schema compatibility issue
+
+A previous report identified:
+
+`contact_email` is NOT NULL in `public.influencers`.
+
+Discovery records without an email were failing database upserts.
+
+The assignment explicitly requires missing emails to be represented as:
+
+`Not Found`
+
+Ensure database persistence uses the required value consistently.
+
+Also verify the existing `discovery_runs` columns. Earlier changes referenced progress/stat columns that may not exist in the deployed database.
+
+Support the actual base schema and any additive migration columns safely.
+
+Only use compatibility fallbacks for genuinely missing optional columns. Never silently ignore unrelated database errors.
+
+## 1.4 Remove dashboard invitation authentication, but preserve the landing page
+
+This application is for my direct use.
+
+I do not want a login, password, private invitation link, or invitation-token requirement before accessing the dashboard.
+
+Required behavior:
+
+- The existing public landing page remains visually unchanged.
+- Clicking the existing Login CTA opens `/dashboard`.
+- Clicking Get Started opens `/dashboard`.
+- Existing equivalent dashboard-entry CTA buttons also open `/dashboard`.
+- Opening `/dashboard` directly works.
+- Refreshing the dashboard works.
+- Dashboard modules do not require an invitation session.
+- No Access Link Required screen appears.
+- No old invitation-session 401 error blocks normal workspace operations.
+
+Remove only the demo/invitation access checks that block dashboard access and the associated workspace APIs.
+
+Do not remove unrelated Gmail OAuth integration.
+
+Do not automatically redirect the root `/` to `/dashboard`. The public landing page must remain accessible at `/`; only the relevant CTA actions should navigate to the dashboard.
+
+Keep server secrets private even though workspace access does not require login.
+
+Since the dashboard is intentionally accessible without an invitation, implement reasonable server-side request limits and safe validation to reduce API abuse. Do not reintroduce a login wall.
+
+## 1.5 Fix dashboard navigation
+
+All non-dashboard modules must have a visible and working:
+
+`Back to Dashboard`
+
+button.
+
+Modules:
+
+1. Influencers
+2. Campaigns
+3. Content
+4. Incentives
+5. Messages
+6. Reports
+7. Tasks
+8. Settings
+9. Administration
+10. Help
+
+Reuse the existing navigation controls where possible.
+
+Clicking the control must navigate to:
+
+`/dashboard`
+
+Never `/`.
+
+Test direct navigation and page refresh for every module.
+
+Do not redesign the header or sidebar to achieve this.
+
+## 1.6 Fix existing creator discovery before expanding it
+
+The application has previously displayed genuine creator results from YouTube and Instagram, but subsequent recordings showed zero stored records and backend connection errors.
+
+Treat earlier success claims as unverified until reproduced.
+
+Inspect:
+
+- `/api/health`
+- `/api/campaigns?init=true`
+- `/api/influencers`
+- `/api/discovery/youtube`
+- `/api/discovery/instagram`
+
+Check the actual API response and corresponding database state.
+
+Investigate whether:
+
+- Health checks incorrectly report disconnected.
+- API calls are blocked before provider execution.
+- Supabase failures abort discovery before results are returned.
+- Results are discovered but not persisted.
+- Database writes succeed but read queries use the wrong campaign ID.
+- Upsert conflicts cause profiles to disappear from the visible list.
+- Frontend filters hide valid discovered profiles.
+- Qualification filters are applied incorrectly.
+- Gmail OAuth errors are being propagated into unrelated routes.
+- Existing discovery runs remain stuck in `running`.
+- Discovery progress or counts are incorrectly calculated.
+
+### Separate discovery from persistence
+
+This is a mandatory architectural requirement.
+
+The workflow must separate:
+
+1. Platform discovery.
+2. Data normalization.
+3. Qualification.
+4. Database persistence.
+5. Frontend result presentation.
+
+A Supabase persistence failure must not erase genuine API results already returned by YouTube or Apify.
+
+If an API returns genuine creators but Supabase is unavailable:
+
+- Display the real returned creator names.
+- Display the genuine data received from the API.
+- Show a clear persistence warning.
+- Do not claim records were saved.
+- Do not fabricate a database record count.
+
+When Supabase works, persist and read back the records.
+
+The application must distinguish:
+
+- Discovered.
+- Qualified.
+- Saved.
+- Updated.
+- Rejected.
+- Failed to persist.
+
+## 1.7 Complete this audit stage
+
+Before moving forward, verify all the above issues.
+
+However, do not stop after producing an audit report. Implement the necessary fixes and continue automatically.
+
+If an external credential is genuinely missing, fix every independent code issue that can be fixed, then identify the exact missing credential in the final report.
+
+Never invent credentials or claim that a missing provider integration is working.
+
+---
+
+# PART 2 — COMPLETE INFLUENCER DISCOVERY AND QUALIFICATION
+
+After the existing application is stable, complete the discovery system.
+
+## 2.1 Supported discovery providers
+
+### YouTube
+
+Use the genuine YouTube Data API v3.
+
+Existing API flow may use:
+
+- `search.list`
+- `channels.list`
+- `playlistItems.list`
+- `videos.list`
+
+Use the appropriate API calls to discover channels, retrieve subscriber statistics, and inspect recent public videos.
+
+Use the existing YouTube service where possible.
+
+Never replace YouTube Data API with Apify simply for convenience.
+
+### Instagram
+
+Use the existing Apify integration.
+
+Preferred Actor:
+
+`apify/instagram-search-scraper`
+
+Use the correct Actor input format for user discovery.
+
+Use the server-side Apify REST API.
+
+The workflow should:
+
+1. Start an Actor run.
+2. Track the run status.
+3. Retrieve the dataset ID.
+4. Fetch dataset items.
+5. Normalize actual returned profiles.
+6. Persist and link records where possible.
+
+Do not confuse the Instagram search Actor input with the separate Instagram scraper input for collecting posts from known profile URLs.
+
+Use the actual schema for the selected Actor.
+
+Never fabricate records when an Actor returns zero results.
+
+## 2.2 Minimum 50-influencer requirement
+
+The assignment requires at least 50 discovered influencers in the test run.
+
+Implement a bounded discovery workflow capable of collecting at least 50 genuine creator profiles across the available sources.
+
+Target:
+
+`50+ genuine discovered influencer profiles combined across supported platforms`
+
+Report the exact counts for:
+
+- YouTube raw results.
+- Instagram raw results.
+- Total unique discovered profiles.
+- Duplicate profiles.
+- Qualified profiles.
+- Rejected profiles.
+- Persisted records.
+
+Use multiple relevant search queries, pagination, bounded batches, and deduplication.
+
+Example Beauty & Skincare queries:
+
+- Indian skincare creators.
+- Indian skincare reviews.
+- Sunscreen review India.
+- Dermatologist skincare India.
+- Beauty and skincare routines India.
+- Indian beauty product reviews.
+- Affordable skincare India.
+- Acne skincare India.
+- Skincare product recommendations India.
+- Indian beauty influencers.
+
+These are discovery suggestions, not hardcoded result records.
+
+Avoid repeated queries that return identical creators.
+
+Use a reasonable maximum request count, runtime limit, API quota budget, and Apify credit budget.
+
+Do not send unlimited Actor runs or make uncontrolled API calls.
+
+If 50 unique results cannot be collected due to a real provider limitation, report the actual number and the reason. Do not fake the remaining records.
+
+## 2.3 Discovery filtering
+
+The system must support configurable qualification criteria.
+
+Relevant criteria:
+
+- Category / niche.
+- Platform.
+- Geography.
+- Followers.
+- Engagement rate.
+- Brand fit.
+- Content relevance.
+
+### Follower range
+
+The assignment defines micro-influencers generally as:
+
+`5,000–100,000 followers`
+
+Use this as the assignment-level default when no campaign-specific range exists.
+
+However, preserve an explicitly configured active campaign range.
+
+For example, if the selected campaign is configured for 5,000–10,000 followers, do not silently change it to 100,000.
+
+Make the actual range visible in the UI and use the same configuration in frontend filtering and backend qualification.
+
+Enforce:
+
+`minimum_followers <= actual_followers <= maximum_followers`
+
+Do not silently override these values.
+
+### Engagement calculation
+
+Use real available public metrics.
+
+For Instagram, use a clearly documented formula based on recent accessible public posts.
+
+A possible calculation is:
+
+`Average ((likes + comments) / followers) × 100`
+
+For YouTube, use actual recent video metrics and a documented formula based on subscriber count.
+
+For example:
+
+`Average (likes + comments) / subscribers × 100`
+
+Use the actual sample count and data available.
+
+If likes, comments, subscribers, or required metrics are unavailable, do not fabricate an engagement percentage.
+
+Record:
+
+- Engagement rate.
+- Number of posts/videos sampled.
+- Metric collection date.
+- Calculation methodology.
+- Data availability status.
+
+Apply the campaign's configured engagement threshold.
+
+### Geography verification
+
+The campaign may target India.
+
+Do not automatically mark a creator as India-verified solely because their biography contains the word India.
+
+Use actual location/country data where available, such as explicitly supplied profile location or channel country.
+
+Distinguish:
+
+- Verified.
+- Likely.
+- Unknown.
+
+Do not confuse account country with audience geography.
+
+Audience geography is optional unless actual audience analytics are available through a permitted source.
+
+If location data is insufficient, mark it `Unknown` and explain its qualification treatment.
+
+### Classification output
+
+Every discovered profile must have:
+
+- `PASS`
+- `FAIL`
+- `REVIEW_REQUIRED`
+
+Store clear rejection reasons.
+
+Examples:
+
+- Below follower threshold.
+- Above follower threshold.
+- Engagement below minimum.
+- Niche mismatch.
+- Geography unverified.
+- Missing required metrics.
+- Potential duplicate.
+- Insufficient public content.
+
+Do not discard failed profiles from the discovery dataset.
+
+Preserve rejected profiles and their qualification reasons for reporting.
+
+---
+
+# PART 3 — COMPLETE PROFILE ENRICHMENT SYSTEM
+
+Implement full profile enrichment for every shortlisted influencer.
+
+This is Phase 2 of the assignment.
+
+The objective is to collect enough genuine public information to personalize a collaboration pitch.
+
+## 3.1 Required profile fields
+
+Each record should support:
+
+| Field | Requirement |
+|---|---|
+| Influencer Name | Mandatory |
+| Platform | Mandatory |
+| Profile URL | Mandatory |
+| Follower Count | Mandatory |
+| Engagement Rate | Mandatory where measurable |
+| Category / Niche | Mandatory |
+| Content Themes | Mandatory, with unavailable data clearly marked |
+| Contact Email | Mandatory field; use Not Found when unavailable |
+| Instagram / YouTube URL | Optional according to platform |
+| Website | Optional |
+| Audience Age | Optional |
+| Audience Gender | Optional |
+| Audience Geography | Optional |
+
+Also preserve useful provenance fields:
+
+- Public email source URL.
+- Profile source.
+- Discovery source.
+- Last enrichment date.
+- Enrichment status.
+- Data confidence.
+- Content evidence.
+- Qualification status.
+
+## 3.2 Email enrichment
+
+Use the existing email enrichment service and improve it as necessary.
+
+Possible permitted sources:
+
+1. Public YouTube channel description.
+2. Public Instagram profile business contact data returned by the provider.
+3. Public profile website.
+4. Official website contact page.
+5. Public business/collaboration contact page.
+6. Public creator portfolio.
+
+Use safe and bounded retrieval.
+
+Implement:
+
+- URL normalization.
+- Safe HTTP requests.
+- SSRF protection.
+- Private/internal IP blocking.
+- Redirect validation.
+- MIME/type validation.
+- Reasonable timeout.
+- Maximum response-size limits.
+- Domain and source tracking.
+- Duplicate email detection.
+- Basic email syntax validation.
+
+Do not attempt to bypass access restrictions.
+
+Do not extract private personal information.
+
+Do not guess email addresses from names or domains.
+
+Do not invent email addresses using common formats.
+
+If no public email is found, save exactly:
+
+`Not Found`
+
+The email must also retain its provenance.
+
+Distinguish:
+
+- Not Found.
+- Found Publicly.
+- Syntax Valid.
+- Ready for Review.
+- Approved for Outreach.
+- Sent.
+- Failed.
+
+Important:
+
+An extracted public email is not automatically a verified deliverable email.
+
+Do not label an address as deliverability-verified unless an actual permitted verification process supports that claim.
+
+## 3.3 Public contact information
+
+Where available, retain:
+
+- Public contact email.
+- Website.
+- Instagram profile URL.
+- YouTube channel URL.
+- Other publicly provided creator/business contact URL.
+
+Do not generate a private telephone number.
+
+If optional audience or demographic information is unavailable, show `Not Available`.
+
+Never make demographic assumptions based on creator appearance, names, or unrelated information.
+
+## 3.4 Content theme extraction
+
+Use available public data:
+
+- Profile biography.
+- Channel description.
+- Public video titles.
+- Public video descriptions.
+- Available post captions or metadata returned by the permitted provider.
+- Public website content.
+
+Extract meaningful content themes such as:
+
+- Skincare routines.
+- Sunscreen reviews.
+- Acne care.
+- Product comparisons.
+- Beauty tutorials.
+- Dermatologist-led education.
+- Affordable skincare.
+- Lifestyle and self-care.
+
+These are examples only.
+
+Actual themes must be based on the influencer's accessible content.
+
+Use Gemini for classification where useful, but provide the source signals.
+
+Do not claim to have watched a video or analyzed a post if the corresponding content was not actually retrieved.
+
+Store the extracted themes, their evidence, and extraction timestamp.
+
+## 3.5 Enrichment workflow and UI
+
+Within the existing Influencers page and existing creator-detail experience:
+
+- Show enrichment status.
+- Show public email or `Not Found`.
+- Show profile website.
+- Show content themes.
+- Show enrichment source where appropriate.
+- Show qualification status.
+- Show reason for missing information.
+
+Reuse existing CreatorCard, tables, tabs, and detail components.
+
+Add functional controls where required:
+
+- Enrich Profile.
+- Re-enrich Profile.
+- View Contact Sources.
+- View Content Themes.
+
+Do not redesign the Influencers page.
+
+---
+
+# PART 4 — AI PERSONALIZED EMAIL AND INSTAGRAM DM GENERATION
+
+Implement the complete Gemini-based personalization layer.
+
+This is Phase 3.
+
+The messages must be genuinely personalized for individual creators.
+
+A single fixed message template reused for everyone does not meet the assignment requirement.
+
+## 4.1 Email collaboration pitch
+
+Generate an individual collaboration email for every qualified and shortlisted influencer.
+
+Mandatory:
+
+`60–90 words`
+
+The email must incorporate available genuine signals, such as:
+
+- Creator name.
+- Niche.
+- Content themes.
+- Public content style.
+- Relevant recent content where available.
+- Relevant audience.
+- Campaign objective.
+- Collaboration proposal.
+- Brand value proposition.
+
+The active example campaign is:
+
+`GlowCare India`
+
+The existing campaign information must be retrieved from the actual database.
+
+Do not invent product specifications, campaign benefits, budgets, brand claims, discounts, or results.
+
+Possible collaboration types:
+
+- Sponsorship.
+- Affiliate campaign.
+- UGC creation.
+- Brand ambassador program.
+- Paid product placement.
+- Barter collaboration.
+
+The user should be able to select the collaboration angle or use the campaign's configured default.
+
+### Email output
+
+Store:
+
+- Subject.
+- Email body.
+- Word count.
+- Personalization signals used.
+- Selected campaign.
+- Influencer ID.
+- Model identifier.
+- Generation timestamp.
+- Generation status.
+- Approval status.
+- Edit history where practical.
+
+Validate the actual word count.
+
+If the email is below 60 or above 90 words, regenerate or correct it before marking it compliant.
+
+## 4.2 Instagram DM
+
+Generate a separate Instagram message.
+
+Mandatory:
+
+`15–30 words`
+
+Use natural language.
+
+Include relevant personalization signals, for example:
+
+- Creator name.
+- Actual content niche.
+- Relevant content theme.
+- Relevant collaboration context.
+
+Do not use fabricated statements such as "I loved your latest reel" when no recent reel metadata was retrieved.
+
+The message must genuinely relate to the individual creator's accessible content.
+
+Store:
+
+- Message text.
+- Word count.
+- Personalization signals.
+- Influencer ID.
+- Campaign ID.
+- Generated timestamp.
+- Approval status.
+
+Validate the word count.
+
+## 4.3 Gemini implementation
+
+Use the existing Gemini service and configured model.
+
+Do not hardcode invented model names.
+
+Read the actual configured `GEMINI_MODEL`.
+
+Use structured output and schema validation where supported.
+
+Handle:
+
+- Rate limits.
+- Timeouts.
+- Invalid JSON.
+- Incomplete outputs.
+- Word-count violations.
+- Missing personalization signals.
+- Provider failures.
+
+Treat creator descriptions and scraped profile text as untrusted input.
+
+Never allow profile content to override system instructions.
+
+Do not generate unsupported factual statements about creators or campaigns.
+
+## 4.4 Message management UI
+
+Enable the existing Messages section.
+
+Provide functional message management:
+
+- View generated email.
+- View generated DM.
+- Edit email.
+- Edit DM.
+- Regenerate email.
+- Regenerate DM.
+- Copy email.
+- Copy DM.
+- Approve message.
+- Reject message.
+- View generation status.
+- View sending status.
+
+Use the existing visual structure and components.
+
+Do not create a new messaging UI that replaces the existing design.
+
+---
+
+# PART 5 — REVIEW, APPROVAL, EMAIL SENDING AND INSTAGRAM DM WORKFLOW
+
+Implement the sending layer and outreach tracking.
+
+This is Phase 4.
+
+## 5.1 Review workflow
+
+The correct process must be:
+
+Discovery
+→ Qualification
+→ Enrichment
+→ Personalization
+→ Review
+→ Approval
+→ Sending or Simulation
+→ Outreach Log
+→ Follow-up
+
+Only qualified and eligible creators should move to outreach review.
+
+A creator with `Not Found` email must not be treated as email-send-ready.
+
+A generated message must not automatically become approved.
+
+The user must be able to inspect and approve it.
+
+## 5.2 Email eligibility
+
+Only select influencers with:
+
+- A real publicly sourced email address.
+- A valid syntax result.
+- An approved message.
+- A valid campaign association.
+- No active suppression record.
+- No previous duplicate outreach for the same campaign/channel unless an explicit permitted retry is selected.
+
+Do not include `Not Found` emails in the send queue.
+
+Show the reason when a creator is ineligible.
+
+## 5.3 Gmail integration
+
+Use the existing Gmail OAuth integration.
+
+Inspect and resolve the previous OAuth callback issue separately from discovery.
+
+Required functionality:
+
+- Connect Gmail.
+- Check connection status.
+- Store integration credentials securely.
+- Encrypt tokens at rest.
+- Refresh access tokens safely where supported.
+- Handle revoked authorization.
+- Retrieve sender identity.
+- Send an individually approved email.
+- Record Gmail message ID where available.
+- Record sent timestamp.
+- Record success/failure status.
+- Capture sanitized failure reasons.
+
+Use only required Gmail scopes.
+
+Do not store access tokens in frontend local storage.
+
+Do not expose OAuth secrets.
+
+### Simulation mode
+
+Default:
+
+`OUTREACH_MODE=simulation`
+
+In simulation mode:
+
+- Do not send real emails.
+- Generate an honest simulated-send event.
+- Record the simulation status.
+- Store the actual approved message snapshot.
+- Show that no email was delivered.
+
+### Live sending
+
+Live email sending must require:
+
+1. Explicit live-mode configuration.
+2. Gmail authorization.
+3. Valid recipient email.
+4. Approved message.
+5. Explicit user action to send.
+6. A confirmation before execution.
+
+Never switch into live mode automatically.
+
+Never send messages as part of discovery or enrichment.
+
+## 5.4 Duplicate prevention
+
+Implement reliable idempotency.
+
+Prevent the same campaign from sending the same outreach channel repeatedly to the same influencer.
+
+Use a stable idempotency key based on the relevant campaign, influencer, channel, and intended message operation.
+
+Use database uniqueness or an atomic database operation where appropriate.
+
+Handle:
+
+- Simultaneous requests.
+- Repeated clicks.
+- Network retries.
+- API timeouts.
+- Partial failures.
+- Page refreshes.
+
+A retry must not accidentally create duplicate emails.
+
+Maintain a suppression list where appropriate.
+
+Keep a clear outreach history.
+
+## 5.5 Instagram DM workflow
+
+Do not bypass Instagram platform restrictions.
+
+Unless the existing integration has authorized official API capabilities and the required permissions, use a manual workflow.
+
+Required:
+
+- Show the generated personalized DM.
+- Copy DM to clipboard.
+- Open the creator's Instagram profile.
+- Allow the user to manually send it.
+- Allow the user to mark it as manually sent.
+- Record timestamp and status.
+
+Statuses may include:
+
+- Draft.
+- Approved.
+- Ready for Manual Sending.
+- Manually Sent.
+- Failed.
+- Skipped.
+
+Never mark a DM as sent merely because the profile link was opened or the text was copied.
+
+Require an explicit user confirmation.
+
+## 5.6 Outreach log
+
+Maintain a reliable log with:
+
+- Influencer.
+- Platform.
+- Recipient email where applicable.
+- Campaign.
+- Message channel.
+- Message snapshot.
+- Approval status.
+- Simulation/live mode.
+- Sending status.
+- Sent timestamp.
+- Provider message ID where applicable.
+- Failure reason.
+- Idempotency key.
+- Created timestamp.
+
+Provide a useful view of past outreach activity.
+
+Prevent duplicates.
+
+---
+
+# PART 6 — ENABLE ALL REMAINING DASHBOARD MODULES
+
+The application currently contains several modules that show `Coming Soon` or incomplete functionality.
+
+Complete them using the existing page designs and application structure.
+
+Do not leave the listed modules as static placeholders.
+
+## 6.1 Campaigns
+
+Implement actual campaign management.
+
+Features:
+
+- Create campaign.
+- Edit campaign.
+- View campaign.
+- Select active campaign.
+- Archive campaign safely where appropriate.
+- Campaign name.
+- Brand.
+- Product/service description.
+- Niche/category.
+- Target geography.
+- Minimum and maximum followers.
+- Engagement threshold.
+- Target platforms.
+- Collaboration type.
+- Campaign brief.
+- Campaign status.
+- Start/end dates where used.
+- Target creator count.
+
+Use the existing `campaigns` database table and related models.
+
+Connect campaign filters to actual discovery.
+
+Campaign-specific criteria must be respected by discovery and qualification.
+
+Never silently change the selected campaign's follower range or engagement threshold.
+
+## 6.2 Content
+
+Enable the existing Content module.
+
+Purpose:
+
+Organize content context and creative collaboration angles for campaigns.
+
+Support:
+
+- Campaign content brief.
+- Product positioning supplied by the user.
+- Content themes.
+- Creator-relevant content angles.
+- Suggested collaboration formats.
+- UGC ideas.
+- Sponsorship concepts.
+- Affiliate concepts.
+- Campaign-specific creative directions.
+- Content notes.
+
+Content suggestions must be based on actual campaign information and available creator context.
+
+Do not invent brand claims or product benefits.
+
+Allow saving, editing, and linking content ideas to campaigns and influencers.
+
+## 6.3 Incentives
+
+Enable the existing Incentives module.
+
+Support:
+
+- Paid sponsorship.
+- Fixed compensation.
+- Barter.
+- Affiliate commission.
+- Product gifting.
+- UGC fee.
+- Custom collaboration terms.
+
+Store values only when entered or approved by the user.
+
+Support:
+
+- Amount.
+- Currency.
+- Incentive type.
+- Campaign.
+- Influencer.
+- Offer status.
+- Notes.
+- Approval status.
+
+Do not invent compensation amounts.
+
+Provide a way to associate an approved incentive with a creator and outreach record.
+
+## 6.4 Messages
+
+Enable the existing Messages module as described in Part 4 and Part 5.
+
+It must show real generated messages and actual sending states.
+
+No placeholder message list.
+
+Support filters by:
+
+- Campaign.
+- Influencer.
+- Channel.
+- Approval status.
+- Sending status.
+- Date.
+
+## 6.5 Reports
+
+Implement real analytics using database records.
+
+Reports should include:
+
+### Discovery metrics
+
+- Total discovered.
+- YouTube discoveries.
+- Instagram discoveries.
+- Unique creators.
+- Duplicate records.
+- Qualification pass count.
+- Qualification fail count.
+- Review required count.
+
+### Enrichment metrics
+
+- Profiles enriched.
+- Emails found.
+- Emails not found.
+- Syntax-valid emails.
+- Website links found.
+- Content themes extracted.
+- Enrichment failures.
+
+### Personalization metrics
+
+- Emails generated.
+- DMs generated.
+- Messages approved.
+- Messages rejected.
+- Generation failures.
+
+### Outreach metrics
+
+- Simulation sends.
+- Actual emails sent.
+- Failed sends.
+- Manually sent DMs.
+- Pending approvals.
+- Duplicate attempts blocked.
+- Suppressed contacts.
+
+Reports must be calculated from actual stored records.
+
+Do not hardcode dashboard metrics.
+
+Where counts are unavailable, show zero only when a real database query confirms zero.
+
+Clearly distinguish simulation activity from live sends.
+
+Support date and campaign filters.
+
+Provide CSV export where appropriate.
+
+## 6.6 Tasks
+
+Implement task and follow-up management.
+
+Support:
+
+- Create follow-up task.
+- Assign campaign.
+- Link influencer.
+- Link outreach message.
+- Task title.
+- Description.
+- Due date.
+- Priority.
+- Status.
+- Completion timestamp.
+- Notes.
+
+Useful task examples:
+
+- Review creator profile.
+- Find missing contact email.
+- Review generated email.
+- Approve outreach.
+- Follow up after initial email.
+- Check manually sent Instagram DM.
+- Update creator response.
+
+Use real database persistence.
+
+Do not automatically send follow-up messages without approval.
+
+## 6.7 Settings
+
+Implement real application settings.
+
+Include:
+
+- Selected campaign defaults.
+- Default follower criteria.
+- Default engagement threshold.
+- Preferred platforms.
+- Discovery limits.
+- Enrichment preferences.
+- Gemini model/configuration status.
+- Supabase connectivity status.
+- YouTube API status.
+- Apify API status.
+- Gmail connection status.
+- Outreach mode.
+- Safe sending preferences.
+
+Secrets must never be visible.
+
+Display only safe status labels such as:
+
+- Connected.
+- Not Connected.
+- Configuration Missing.
+- Authentication Required.
+- Provider Error.
+
+Allow non-secret settings to be edited and saved.
+
+Do not allow the frontend to retrieve secret key values.
+
+## 6.8 Administration
+
+Enable the existing Administration module.
+
+Provide useful operational visibility:
+
+- Application health.
+- Supabase connectivity.
+- API provider status.
+- Discovery run history.
+- Discovery progress.
+- Discovery failures.
+- Provider quota information where available.
+- Apify run history.
+- Enrichment job history.
+- Message-generation job history.
+- Outreach activity.
+- Sanitized audit events.
+- Configuration diagnostics.
+
+Never expose secret values.
+
+Do not create fake usage statistics.
+
+If quota usage cannot be retrieved from a provider, say `Not Available` rather than estimate a precise value.
+
+## 6.9 Help
+
+Enable the Help module.
+
+Provide practical application guidance:
+
+- How to create a campaign.
+- How to discover creators.
+- How qualification works.
+- How email enrichment works.
+- How to generate personalized messages.
+- How to review and approve messages.
+- How simulation sending works.
+- How manual Instagram DM works.
+- How to interpret dashboard statistics.
+- Troubleshooting integration issues.
+
+Use actual application behavior and configuration.
+
+Do not document features that have not been implemented.
+
+---
+
+# PART 7 — DATABASE, SCHEMA AND DATA INTEGRITY
+
+Inspect the current Supabase schema before introducing database changes.
+
+Existing tables may include:
+
+- `campaigns`
+- `influencers`
+- `campaign_influencers`
+- `discovery_runs`
+- `outreach_messages`
+- `outreach_logs`
+- `outreach_suppressions`
+- `integration_credentials`
+- `demo_audit_logs`
+
+Use actual existing table definitions.
+
+Do not assume column names or constraints without inspection.
+
+## 7.1 Additive migrations
+
+If new fields or tables are needed:
+
+- Create ordered SQL migration files.
+- Use safe additive changes.
+- Preserve existing records.
+- Preserve existing constraints unless a specific fix is necessary.
+- Add appropriate indexes.
+- Add unique constraints for deduplication and idempotency.
+- Add timestamps and foreign keys as appropriate.
+- Use transaction-safe migration patterns.
+
+Never:
+
+- Drop existing production tables.
+- Truncate existing tables.
+- Reset the database.
+- Delete real creator records.
+- Replace the entire schema.
+- Remove existing campaign data.
+
+Do not automatically execute destructive or unreviewed production migrations.
+
+Provide the exact migration file and its execution instructions.
+
+If the existing database already contains the required columns, do not add duplicates.
+
+## 7.2 Data model requirements
+
+Ensure existing or extended models can represent:
+
+- Influencer provenance.
+- Platform-specific profile identity.
+- Discovery source.
+- Follower metrics.
+- Engagement metrics.
+- Qualification outcome.
+- Rejection reasons.
+- Geography verification.
+- Content themes.
+- Contact email provenance.
+- Enrichment status.
+- Campaign relationship.
+- Message-generation history.
+- Message approval.
+- Sending status.
+- Outreach log.
+- Task relationship.
+- Incentive relationship.
+
+Preserve unique identity by platform/profile URL.
+
+Normalize canonical profile URLs before deduplication.
+
+## 7.3 Consistency
+
+Use database transactions or safe repository operations where multi-table writes require them.
+
+A profile should not be marked persisted unless the actual write succeeded.
+
+A message should not be marked approved without an approval state update.
+
+A simulated email must not be marked as a live email.
+
+A DM must not be marked manually sent without user confirmation.
+
+---
+
+# PART 8 — BACKEND QUALITY AND ERROR HANDLING
+
+Keep business logic out of React components wherever possible.
+
+Use existing service/repository architecture.
+
+Required characteristics:
+
+- Type-safe request and response schemas.
+- Input validation.
+- Clear HTTP status codes.
+- Consistent error responses.
+- Provider-specific error mapping.
+- Safe retries.
+- Timeouts.
+- Rate limits.
+- Idempotency.
+- Structured logs.
+- No secret leakage.
+- No silent failures.
+
+### Discovery execution
+
+Support bounded and resumable discovery runs.
+
+Large discovery runs should not depend on one long synchronous request if the current serverless execution limit prevents it.
+
+Use the existing run and progress architecture.
+
+Where background jobs are not available, use safe resumable chunks and explicit progress tracking.
+
+Track:
+
+- Run ID.
+- Campaign ID.
+- Platform.
+- Search parameters.
+- Status.
+- Started timestamp.
+- Finished timestamp.
+- Records fetched.
+- Unique records.
+- Qualified records.
+- Rejected records.
+- Saved records.
+- Failed persistence count.
+- Provider quota/cost metadata where available.
+- Sanitized error.
+
+Do not leave runs permanently marked as `running` after timeout or cancellation.
+
+Support cancellation where the existing architecture allows it.
+
+Do not start duplicate discovery jobs for the same request accidentally.
+
+### Frontend data handling
+
+The frontend must distinguish:
+
+- Loading.
+- Connected.
+- Disconnected.
+- No results.
+- Partial results.
+- Failed discovery.
+- Successful discovery.
+- Persistence failed.
+- Saved successfully.
+
+Do not show "No influencers found" when the API call actually failed.
+
+Do not show "Backend disconnected" merely because Gmail is disconnected.
+
+Do not show "Saved" before Supabase confirms the write.
+
+---
+
+# PART 9 — EXPORTS AND ASSIGNMENT DELIVERABLES
+
+Implement the required export functionality.
+
+## 9.1 Influencer dataset CSV
+
+The export must support at least:
+
+- Influencer Name.
+- Platform.
+- Profile URL.
+- Followers.
+- Engagement Rate.
+- Category.
+- Content Themes.
+- Contact Email.
+- Website.
+- Geography Status.
+- Qualification Status.
+- Rejection Reason.
+- Enrichment Status.
+- Campaign.
+
+Include rejected profiles as well as qualified profiles where the user requests the full discovery dataset.
+
+Do not export fake information.
+
+Use `Not Found` for missing public email addresses.
+
+Protect against CSV formula injection.
+
+## 9.2 Personalized messages export
+
+Provide:
+
+- Email subject.
+- Email body.
+- Instagram DM.
+- Influencer.
+- Campaign.
+- Message word count.
+- Approval status.
+
+## 9.3 Outreach tracker export
+
+Include:
+
+- Influencer.
+- Email.
+- Campaign.
+- Message generated.
+- Message approved.
+- Sent or simulated.
+- Channel.
+- Date.
+- Status.
+- Error reason where relevant.
+
+Distinguish real sending from simulation.
+
+## 9.4 Documentation
+
+Update the existing README rather than replacing unrelated documentation.
+
+Document:
+
+- Technology stack.
+- Architecture.
+- APIs and services.
+- Database.
+- Discovery workflow.
+- Qualification methodology.
+- Engagement formulas.
+- Geography verification.
+- Email enrichment.
+- Gemini personalization.
+- Gmail OAuth.
+- Simulation and live-send workflow.
+- Manual Instagram DM workflow.
+- Duplicate prevention.
+- CSV exports.
+- Environment variables.
+- Setup instructions.
+- Migration instructions.
+- Limitations.
+- Security considerations.
+- Deployment instructions.
+
+Documentation must reflect the actual implemented code.
+
+---
+
+# PART 10 — TESTING AND ACCEPTANCE CRITERIA
+
+Do not mark this work complete based only on compilation.
+
+Run the tests available in the actual project.
+
+Where test coverage is missing, add useful tests.
+
+## 10.1 Build and code quality
+
+Run where available:
+
+- `npm test`
+- `npm run lint`
+- `npx tsc --noEmit`
+- `npm run build`
+- Existing smoke tests.
+
+Fix regressions introduced by your changes.
+
+Do not change tests merely to make broken behavior appear successful.
+
+## 10.2 Authentication and navigation tests
+
+Test:
+
+- Open `/`.
+- Click Login.
+- Click Get Started.
+- Directly open `/dashboard`.
+- Directly open each module.
+- Refresh each module.
+- Click Back to Dashboard from every module.
+- Use browser Back and Forward.
+
+Expected:
+
+- No invitation authentication page.
+- No password requirement.
+- Existing landing page appearance unchanged.
+- Dashboard CTA navigation works.
+- Every module returns to `/dashboard`.
+
+## 10.3 Supabase tests
+
+Test:
+
+- Actual connectivity.
+- Read access.
+- Write access where safe.
+- Read-back verification.
+- Unique constraints.
+- Campaign relationships.
+- Missing-email handling.
+- Discovery run status updates.
+- Outreach idempotency.
+- Task persistence.
+- Incentive persistence.
+
+Never report successful persistence without an actual read-back.
+
+Do not insert fake production records as a test shortcut.
+
+## 10.4 Provider tests
+
+### YouTube
+
+Verify:
+
+- Actual API request.
+- Actual HTTP status.
+- Actual returned channel IDs.
+- Actual channel names.
+- Actual subscriber counts.
+- Recent video sample.
+- Engagement inputs.
+- API errors and quota errors if any.
+
+### Instagram
+
+Verify:
+
+- Actual Actor ID.
+- Actual Actor Run ID.
+- Actual Dataset ID.
+- Execution status.
+- Actual returned usernames.
+- Profile URLs.
+- Actual follower counts.
+- Dataset retrieval status.
+- Provider error or credit limitations if any.
+
+Never substitute placeholder IDs or usernames.
+
+## 10.5 Discovery acceptance
+
+A successful test should establish:
+
+- At least 50 genuine unique profiles collected in the test run, where provider availability and quota permit.
+- Both platform sources work independently.
+- Deduplication works.
+- Filters are applied correctly.
+- Failed profiles have reasons.
+- Missing emails are represented honestly.
+- Supabase read-back matches the persisted count.
+- Frontend results reflect real records.
+
+If the APIs return fewer than 50 due to a genuine limitation, report the exact number and blocker. Do not lower qualification criteria or fabricate profiles to satisfy the number.
+
+## 10.6 Enrichment acceptance
+
+For test records, verify:
+
+- Email source.
+- Email status.
+- `Not Found` behavior.
+- Website extraction.
+- Content theme extraction.
+- Data provenance.
+- Enrichment failure handling.
+
+## 10.7 Personalization acceptance
+
+Verify actual Gemini generation.
+
+For sample shortlisted influencers, report:
+
+- Influencer name.
+- Niche.
+- Content signals.
+- Email word count.
+- DM word count.
+- Personalization evidence.
+- Generation status.
+
+Ensure:
+
+- Email is 60–90 words.
+- DM is 15–30 words.
+- Messages are not identical generic templates.
+- Unsupported creator claims are not included.
+
+## 10.8 Outreach acceptance
+
+Test only in simulation mode.
+
+Verify:
+
+- Eligibility.
+- Approval.
+- Simulation send.
+- Log creation.
+- Idempotency.
+- Duplicate prevention.
+- Manual DM state transitions.
+- CSV export.
+
+Never transmit actual messages during these tests.
+
+## 10.9 Module acceptance
+
+Test every module individually.
+
+| Module | Minimum acceptance |
+|---|---|
+| Dashboard | Real database-driven summary |
+| Influencers | Genuine discovery, qualification and enrichment |
+| Campaigns | Create/read/update campaign |
+| Content | Save and retrieve content themes/ideas |
+| Incentives | Create and retrieve incentive |
+| Messages | Generate, edit, approve, copy |
+| Reports | Real database-derived metrics |
+| Tasks | Create/update/complete task |
+| Settings | Save non-secret preferences and show integration status |
+| Administration | Real health, runs and sanitized logs |
+| Help | Accurate application guidance |
+
+No module should remain a static Coming Soon placeholder after implementation.
+
+---
+
+# PART 11 — EXECUTION ORDER
+
+You must follow this order while completing the work.
+
+### Stage 1: Read-only project audit
+
+Inspect code, architecture, existing database schema, environment configuration, and existing Git changes.
+
+Identify all existing failures.
+
+### Stage 2: Stabilization and bug fixing
+
+Resolve:
+
+- Gmail OAuth error leaking into discovery.
+- Supabase configuration and connectivity issue.
+- Invitation authentication dependency.
+- Direct dashboard access.
+- Back to Dashboard functionality.
+- Existing YouTube and Instagram discovery failures.
+- Database persistence errors.
+- Frontend discovery error handling.
+
+Verify these fixes before expanding the system.
+
+### Stage 3: Complete discovery and qualification
+
+Implement the 50+ unique genuine profile workflow, multi-query discovery, deduplication, filtering, qualification, and status tracking.
+
+### Stage 4: Profile enrichment
+
+Implement public email extraction, website collection, content themes, contact provenance, and honest missing-data handling.
+
+### Stage 5: AI personalization
+
+Implement individually personalized 60–90-word emails and 15–30-word Instagram DMs, with editing, regeneration, and approval.
+
+### Stage 6: Review and sending
+
+Implement Gmail connection, approval, simulation/live separation, duplicate prevention, outreach logging, and manual Instagram DM tracking.
+
+### Stage 7: Enable remaining modules
+
+Implement Campaigns, Content, Incentives, Messages, Reports, Tasks, Settings, Administration, and Help using their existing screens.
+
+### Stage 8: Database and documentation
+
+Create only necessary additive migrations, update README, implement exports, and verify data integrity.
+
+### Stage 9: Complete acceptance testing
+
+Run code quality checks, functional tests, live API checks where credentials are available, database read-back, and module tests.
+
+Do not stop at an intermediate report. Continue through every stage that can be completed with the available code and configuration.
+
+If an external credential is missing, do all independent work first and report the exact blocker.
+
+---
+
+# PART 12 — FINAL REPORT REQUIRED
+
+When implementation is complete, provide an accurate, detailed report.
+
+## A. Existing Issues Resolved
+
+For each old problem:
+
+- Previous error.
+- Actual root cause.
+- Files modified.
+- Fix implemented.
+- Verification evidence.
+- Pass/Fail/Blocked.
+
+Specifically report:
+
+- Gmail OAuth callback problem.
+- Supabase configuration problem.
+- Invitation authentication.
+- Dashboard navigation.
+- YouTube discovery.
+- Instagram discovery.
+- Database persistence.
+
+## B. Files Modified
+
+List every modified, created, or deleted file.
+
+For each important file, explain why it changed.
+
+Do not omit migration files or documentation changes.
+
+## C. Live Discovery Evidence
+
+Report:
+
+- YouTube profiles retrieved.
+- Instagram profiles retrieved.
+- Unique profiles.
+- Duplicates.
+- Qualified.
+- Rejected.
+- Saved.
+- Persistence failures.
+
+Include actual creator usernames/names, actual profile URLs, actual follower counts, and genuine provider identifiers for representative returned records.
+
+No placeholders.
+
+## D. Profile Enrichment Evidence
+
+Report:
+
+- Profiles enriched.
+- Public emails found.
+- Emails not found.
+- Websites found.
+- Content themes extracted.
+- Enrichment failures.
+
+Include real examples with source provenance.
+
+Do not expose unnecessary personal information.
+
+## E. AI Personalization Evidence
+
+Show actual generated examples:
+
+- Influencer name.
+- Email subject.
+- Email body.
+- Email word count.
+- Instagram DM.
+- DM word count.
+
+Use actual discovered profiles.
+
+## F. Outreach Evidence
+
+Report:
+
+- Approved messages.
+- Simulated sends.
+- Actual sends, if any.
+- Manually sent DMs.
+- Duplicate attempts blocked.
+- Failed sends.
+- Outreach log read-back.
+
+The expected result during development is simulation mode, with zero real email transmissions.
+
+## G. All Module Statuses
+
+List every module and its implemented functions.
+
+Do not write PASS if only the page builds successfully.
+
+## H. Test Results
+
+Include exact results of:
+
+- TypeScript.
+- Lint.
+- Unit tests.
+- API tests.
+- Build.
+- Smoke tests.
+- Database tests.
+- Live provider tests.
+- Module route tests.
+
+Distinguish:
+
+- Verified with actual execution.
+- Verified by code inspection.
+- Verified using unit mocks.
+- Not executed.
+- Blocked by external configuration.
+
+## I. Remaining Configuration Requirements
+
+List only variables or external settings that are genuinely missing or incorrect.
+
+Do not display their values.
+
+If the Vercel production environment requires manual updates, identify the exact variable names and environments.
+
+Do not claim that a local development test proves production deployment success.
+
+## J. Final Verdict
+
+Choose one:
+
+- COMPLETE AND VERIFIED.
+- IMPLEMENTED — SOME LIVE INTEGRATIONS BLOCKED.
+- PARTIALLY COMPLETE.
+- NOT COMPLETE.
+
+Explain the verdict using actual evidence.
+
+---
+
+# FINAL NON-NEGOTIABLE INSTRUCTIONS
+
+1. Work in the existing MicroReach AI repository.
+2. Preserve the existing UI and visual design.
+3. Do not recreate the application.
+4. Do not replace real APIs with mock data.
+5. Do not fabricate influencer profiles, metrics, contact emails, or outreach activity.
+6. Fix old bugs before building dependent features.
+7. Do not let Gmail OAuth failures affect YouTube or Instagram discovery.
+8. Do not let Supabase persistence failures hide genuine discovery results.
+9. Do not mark records saved without actual database confirmation.
+10. Do not send real outreach during testing.
+11. Keep `OUTREACH_MODE=simulation`.
+12. Do not bypass Instagram restrictions.
+13. Do not expose server credentials.
+14. Do not delete existing database records or reset the database.
+15. Use additive migrations only.
+16. Do not change campaign filters silently.
+17. Do not leave any listed module as a static Coming Soon page.
+18. Do not mark implementation successful only because the application compiles.
+19. Do not push to GitHub or deploy to Vercel without an explicit request.
+20. Do not stop after the initial audit. Fix the problems and continue implementing all phases.
+
+**THE FINAL OBJECTIVE**
+
+MicroReach AI must become a functional end-to-end influencer outreach platform:
+
+Real Creator Discovery
+→ 50+ Genuine Influencer Profiles
+→ Qualification and Classification
+→ Public Contact Enrichment
+→ Content Theme Extraction
+→ Personalized Email Generation
+→ Personalized Instagram DM Generation
+→ Human Review and Approval
+→ Gmail Simulation / Controlled Sending
+→ Manual Instagram DM Workflow
+→ Duplicate Prevention
+→ Outreach Tracking
+→ Reports and CSV Exports
+
+Every stage must use real data, preserve data provenance, handle errors honestly, and work through the existing MicroReach AI interface.
+
+The existing UI must remain visually unchanged. Only the functionality behind it and the minimum required controls should be extended.

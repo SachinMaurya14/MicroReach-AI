@@ -125,7 +125,7 @@ export async function getGmailConnectionStatus(): Promise<GmailStatusInfo> {
     }
 
     const senderLabel = data.account_email ?? null;
-    const displayLabel = senderLabel ?? 'authorized Gmail account';
+    const displayLabel = senderLabel ?? 'Authorized Gmail Account (gmail.send scope)';
 
     return {
       ...base,
@@ -134,7 +134,7 @@ export async function getGmailConnectionStatus(): Promise<GmailStatusInfo> {
       message:
         cfg.outreachMode === 'live'
           ? `Gmail connected (${displayLabel}).`
-          : `Gmail authorized (${displayLabel}), currently running in Simulation mode.`,
+          : `Gmail authorized (${displayLabel}), running in Simulation mode.`,
     };
   } catch {
     return {

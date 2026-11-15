@@ -33,6 +33,13 @@ campaignRouter.post('/campaigns', async (req, res, next) => {
       max_followers: req.body?.max_followers,
       min_engagement_rate: req.body?.min_engagement_rate,
       status: req.body?.status,
+      product_description: req.body?.product_description,
+      target_platforms: req.body?.target_platforms,
+      collaboration_type: req.body?.collaboration_type,
+      campaign_brief: req.body?.campaign_brief,
+      start_date: req.body?.start_date,
+      end_date: req.body?.end_date,
+      target_creator_count: req.body?.target_creator_count,
     });
     res.status(201).json({ campaign });
   } catch (err) {

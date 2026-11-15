@@ -2,18 +2,16 @@ import React from 'react';
 import {
   ChevronDown,
   HelpCircle,
-  LogOut,
   Menu,
   PanelRightOpen,
   Plus,
   Search,
 } from 'lucide-react';
-import { useDemoSession } from '../../hooks/useDemoSession';
 import { CampaignOption } from '../../types/dashboard';
 
 interface AppHeaderProps {
   campaigns: CampaignOption[];
-  selectedCampaign: CampaignOption;
+  selectedCampaign?: CampaignOption;
   onSelectCampaign: (id: string) => void;
   globalSearch: string;
   onSearchChange: (value: string) => void;
@@ -36,8 +34,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   drawerOpen,
   onReopenDrawer,
 }) => {
-  const { logoutDemoSession } = useDemoSession();
-
   return (
     <header className="h-16 shrink-0 bg-white border-b border-[#E5E7EB] px-4 sm:px-6 flex items-center justify-between gap-3">
       {/* Left: Mobile Sidebar Toggle + Breadcrumb */}
@@ -57,7 +53,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             &gt;
           </span>
           <span className="font-semibold text-[#111827] truncate">
-            {selectedCampaign.breadcrumbName}
+            {selectedCampaign?.breadcrumbName ?? 'GlowCare — India Skincare Campaign'}
           </span>
         </nav>
       </div>
@@ -84,15 +80,19 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         <div className="relative hidden sm:block">
           <select
             aria-label="Select campaign"
-            value={selectedCampaign.id}
+            value={selectedCampaign?.id ?? ''}
             onChange={(e) => onSelectCampaign(e.target.value)}
             className="h-[38px] max-w-[210px] appearance-none rounded-lg border border-[#D1D5DB] bg-white pl-3 pr-8 text-[13px] font-medium text-[#111827] hover:bg-[#F9FAFB] cursor-pointer truncate"
           >
-            {campaigns.map((camp) => (
-              <option key={camp.id} value={camp.id}>
-                {camp.label}
-              </option>
-            ))}
+            {campaigns.length === 0 ? (
+              <option value="">Default Campaign</option>
+            ) : (
+              campaigns.map((camp) => (
+                <option key={camp.id} value={camp.id}>
+                  {camp.label}
+                </option>
+              ))
+            )}
           </select>
           <ChevronDown
             className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B7280]"
@@ -132,20 +132,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           </button>
         )}
 
-        {/* Lock / End Demo Session */}
-        <button
-          type="button"
-          onClick={() => void logoutDemoSession()}
-          title="Lock shared demo session"
-          aria-label="Lock shared demo session"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white text-[#4B5563] hover:bg-[#F9FAFB] hover:text-[#111827] cursor-pointer shrink-0"
-        >
-          <LogOut className="h-4 w-4" aria-hidden="true" />
-        </button>
-
         {/* Shared Workspace Avatar Initials */}
         <div
-          title="Shared Demo Workspace"
+          title="MicroReach AI Workspace"
           className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#DDD6FE] bg-[#EDE9FE] text-xs font-bold text-[#5B21B6] shrink-0"
         >
           MR

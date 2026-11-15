@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 
 export type AppRoutePath =
   | '/'
+  | '/discover'
   | '/demo-access'
   | '/dashboard'
   | '/dashboard/influencers'

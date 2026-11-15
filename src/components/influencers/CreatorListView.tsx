@@ -8,6 +8,7 @@ interface CreatorListViewProps {
   selectedIds: string[];
   onToggleSelect: (id: string) => void;
   onClearFilters: () => void;
+  onInspectProfile?: (profile: InfluencerDemoProfile) => void;
 }
 
 export const CreatorListView: React.FC<CreatorListViewProps> = ({
@@ -15,6 +16,7 @@ export const CreatorListView: React.FC<CreatorListViewProps> = ({
   selectedIds,
   onToggleSelect,
   onClearFilters,
+  onInspectProfile,
 }) => {
   if (profiles.length === 0) {
     return (
@@ -35,7 +37,7 @@ export const CreatorListView: React.FC<CreatorListViewProps> = ({
 
   return (
     <div className="mr-influencers-card overflow-x-auto mr-scroll-thin">
-      <table className="w-full min-w-[740px] border-collapse text-left text-xs">
+      <table className="w-full min-w-[780px] border-collapse text-left text-xs">
         <thead>
           <tr className="border-b border-[#E5E7EB] bg-[#F9FAFB] text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">
             <th className="py-3 pl-4 pr-2 w-10">Select</th>
@@ -44,7 +46,8 @@ export const CreatorListView: React.FC<CreatorListViewProps> = ({
             <th className="py-3 px-3">Est. Public Eng.</th>
             <th className="py-3 px-3">Contact Email</th>
             <th className="py-3 px-3">Instagram / TikTok</th>
-            <th className="py-3 px-4">YouTube</th>
+            <th className="py-3 px-3">YouTube</th>
+            {onInspectProfile && <th className="py-3 px-4 text-right">Enrichment</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-[#E5E7EB] mr-tabular">
@@ -104,25 +107,67 @@ export const CreatorListView: React.FC<CreatorListViewProps> = ({
                 </td>
                 <td className="py-3 px-3">
                   <div className="space-y-1">
-                    <span className="inline-block rounded-full bg-[#EDE9FE] px-2.5 py-0.5 text-[11px] font-medium text-[#5B21B6]">
-                      {profile.primaryNiche}
-                    </span>
+                    <div className="flex flex-wrap items-center gap-1">
+                      <span className="inline-block rounded-full bg-[#EDE9FE] px-2.5 py-0.5 text-[11px] font-medium text-[#5B21B6]">
+                        {profile.primaryNiche}
+                      </span>
+                      {profile.qualificationStatus && (
+                        <span
+                          className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                            profile.qualificationStatus === 'qualified'
+                              ? 'bg-[#D1FAE5] text-[#059669]'
+                              : profile.qualificationStatus === 'needs_review'
+                                ? 'bg-[#FEF3C7] text-[#92400E]'
+                                : 'bg-[#FEE2E2] text-[#DC2626]'
+                          }`}
+                        >
+                          {profile.qualificationStatus === 'qualified'
+                            ? 'PASS'
+                            : profile.qualificationStatus === 'needs_review'
+                              ? 'REVIEW'
+                              : 'FAIL'}
+                        </span>
+                      )}
+                    </div>
                     {profile.qualificationReason && (
-                      <div className="text-[10.5px] text-[#6B7280] max-w-[200px] truncate">
+                      <div className="text-[10.5px] text-[#6B7280] max-w-[220px] truncate" title={profile.qualificationReason}>
                         {profile.qualificationReason}
                       </div>
                     )}
                   </div>
                 </td>
                 <td className="py-3 px-3 font-medium text-[#111827]">
-                  {profile.engagementEstimate > 0
-                    ? `${profile.engagementEstimate.toFixed(1)}% est.`
+                  {profile.engagementRate !== null && profile.engagementRate !== undefined
+                    ? `${profile.engagementRate.toFixed(1)}% est.`
                     : 'Unavailable'}
                 </td>
                 <td className="py-3 px-3 text-[#4B5563]">
-                  {profile.isLiveRecord
-                    ? profile.contactEmail || 'Not Found'
-                    : 'Demo Preview'}
+                  <div>
+                    <div>
+                      {profile.isLiveRecord
+                        ? profile.contactEmail || 'Not Found'
+                        : 'Demo Preview'}
+                    </div>
+                    {profile.contactChannels && profile.contactChannels.length > 0 && (
+                      <div className="mt-0.5 text-[10px] text-[#5B21B6] font-medium">
+                        {Array.from(
+                          new Set(
+                            profile.contactChannels.map((c) =>
+                              c.type === 'instagram'
+                                ? 'IG'
+                                : c.type === 'linkedin'
+                                  ? 'LinkedIn'
+                                  : c.type === 'youtube'
+                                    ? 'YouTube'
+                                    : c.type === 'email'
+                                      ? 'Email'
+                                      : 'Link'
+                            )
+                          )
+                        ).join(' · ')}
+                      </div>
+                    )}
+                  </div>
                 </td>
                 <td className="py-3 px-3 text-[#6B7280]">
                   <span className="inline-flex items-center gap-1.5">
@@ -132,12 +177,23 @@ export const CreatorListView: React.FC<CreatorListViewProps> = ({
                     <span>{profile.platforms.tiktok ?? disconnectedText}</span>
                   </span>
                 </td>
-                <td className="py-3 px-4 font-medium text-[#111827]">
+                <td className="py-3 px-3 font-medium text-[#111827]">
                   <span className="inline-flex items-center gap-1.5">
                     <PlatformIcon platform="youtube" size={14} />
                     <span>{profile.platforms.youtube ?? 'Unavailable'}</span>
                   </span>
                 </td>
+                {onInspectProfile && (
+                  <td className="py-3 px-4 text-right">
+                    <button
+                      type="button"
+                      onClick={() => onInspectProfile(profile)}
+                      className="text-[11px] font-semibold text-[#5B21B6] hover:underline cursor-pointer"
+                    >
+                      Enrich / Details
+                    </button>
+                  </td>
+                )}
               </tr>
             );
           })}

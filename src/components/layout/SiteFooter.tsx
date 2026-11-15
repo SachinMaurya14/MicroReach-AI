@@ -263,7 +263,7 @@ export const SiteFooter: React.FC<SiteFooterProps> = ({
         </div>
 
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#6B7280]">
-          <p>© 2026 MicroReach AI. All rights reserved.</p>
+          <p>Copyright 2026 MicroReach AI. All rights reserved.</p>
           <p>Public marketing preview · Illustrative demo data shown where indicated.</p>
         </div>
       </Container>

@@ -3,13 +3,15 @@ import { AlertCircle, Info, Loader2, XCircle } from 'lucide-react';
 import { AppSidebar } from '../../components/app-shell/AppSidebar';
 import { AddToCampaignModal } from '../../components/influencers/AddToCampaignModal';
 import { AppliedFilters } from '../../components/influencers/AppliedFilters';
+import { CreatorEnrichmentModal } from '../../components/influencers/CreatorEnrichmentModal';
 import { CreatorGrid } from '../../components/influencers/CreatorGrid';
 import { CreatorListView } from '../../components/influencers/CreatorListView';
 import { InfluencerFilterPanel } from '../../components/influencers/InfluencerFilterPanel';
 import { InfluencerSearchToolbar } from '../../components/influencers/InfluencerSearchToolbar';
 import { InfluencerTopTabs } from '../../components/influencers/InfluencerTopTabs';
 import { useInfluencerFilters } from '../../hooks/useInfluencerFilters';
-import { downloadDemoCSV } from '../../utils/downloadDemoCSV';
+import { buildCreatorsExportCsvUrl } from '../../services/api/workspaceApi';
+import { InfluencerDemoProfile } from '../../types/influencer';
 
 export const InfluencersPage: React.FC = () => {
   const {
@@ -32,6 +34,8 @@ export const InfluencersPage: React.FC = () => {
     setNicheFilter,
     platformFilter,
     setPlatformFilter,
+    qualFilter,
+    setQualFilter,
     followerTier,
     setFollowerTier,
     minEngagement,
@@ -40,8 +44,10 @@ export const InfluencersPage: React.FC = () => {
     removeChip,
     clearAllFilters,
     filteredProfiles,
+    totalStoredCount,
     isShowingDemoFallback,
     isBackendConnected,
+    backendError,
     campaigns,
     activeRun,
     discovering,
@@ -50,29 +56,40 @@ export const InfluencersPage: React.FC = () => {
     triggerFindInfluencers,
     cancelActiveDiscovery,
     addSelectedToCampaign,
+    enrichCreatorProfile,
+    updateCreatorChannels,
+    reEvaluateCreators,
   } = useInfluencerFilters();
 
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'list' | 'campaign' | null>(null);
+  const [selectedProfileIdForEnrich, setSelectedProfileIdForEnrich] = useState<string | null>(null);
+
+  const selectedProfileForEnrich: InfluencerDemoProfile | null = selectedProfileIdForEnrich
+    ? filteredProfiles.find((p) => p.id === selectedProfileIdForEnrich) ?? null
+    : null;
+  const activeCamp = campaigns[0] ?? null;
 
   const allVisibleSelected =
     filteredProfiles.length > 0 &&
     filteredProfiles.every((p) => selectedIds.includes(p.id));
 
   const handleExportCsv = () => {
-    if (!isShowingDemoFallback && isBackendConnected) {
-      const qs = new URLSearchParams();
-      if (searchQuery.trim()) qs.set('search', searchQuery.trim());
-      if (nicheFilter !== 'All') qs.set('niche', nicheFilter);
-      if (locationFilter !== 'All') qs.set('country', locationFilter);
-      if (platformFilter !== 'all') qs.set('platform', platformFilter);
-      if (minEngagement > 0) qs.set('minEngagement', String(minEngagement));
-      qs.set('sortBy', sortBy);
-      window.location.assign(`/api/influencers/export.csv?${qs.toString()}`);
+    if (!isBackendConnected) {
+      setDiscoveryBanner('Connect Supabase backend before exporting creator CSV.');
       return;
     }
-    downloadDemoCSV(filteredProfiles);
+    const url = buildCreatorsExportCsvUrl({
+      search: searchQuery.trim() || undefined,
+      niche: nicheFilter !== 'All' ? nicheFilter : undefined,
+      country: locationFilter !== 'All' ? locationFilter : undefined,
+      platform: platformFilter !== 'all' ? platformFilter : undefined,
+      qualificationStatus: qualFilter !== 'all' ? qualFilter : undefined,
+      minEngagement,
+      sortBy,
+    });
+    window.location.assign(url);
   };
 
   const renderWorkspaceContent = () => {
@@ -87,14 +104,10 @@ export const InfluencersPage: React.FC = () => {
         <div className="space-y-4">
           <div className="mr-influencers-card p-6">
             <h2 className="text-lg font-bold text-[#111827]">
-              {isShowingDemoFallback
-                ? 'Current Local Demo Result Summary'
-                : 'Shared Discovery Cohort Summary'}
+              Shared Discovery Cohort Summary
             </h2>
             <p className="mt-1 text-sm text-[#6B7280]">
-              {isShowingDemoFallback
-                ? 'Reflects the locally filtered illustrative demo set only — run YouTube Discovery to collect live profiles.'
-                : 'Reflects live YouTube Data API v3 creator profiles persisted in Supabase PostgreSQL.'}
+              Reflects live YouTube Data API v3 creator profiles persisted in Supabase PostgreSQL.
             </p>
 
             <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4 mr-tabular">
@@ -163,6 +176,8 @@ export const InfluencersPage: React.FC = () => {
           selectedCount={selectedIds.length}
           sortBy={sortBy}
           onSortChange={setSortBy}
+          qualFilter={qualFilter}
+          onQualFilterChange={setQualFilter}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           onOpenAddToList={() => setModalMode('list')}
@@ -175,6 +190,16 @@ export const InfluencersPage: React.FC = () => {
           onClearAll={clearAllFilters}
         />
 
+        {backendError && (
+          <div
+            role="alert"
+            className="flex items-center gap-2.5 rounded-xl border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-xs font-semibold text-[#991B1B]"
+          >
+            <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>{backendError}</span>
+          </div>
+        )}
+
         {discovering && activeRun && (
           <div
             role="status"
@@ -184,7 +209,9 @@ export const InfluencersPage: React.FC = () => {
               <Loader2 className="h-4 w-4 animate-spin shrink-0" aria-hidden="true" />
               <span className="font-semibold">
                 YouTube Discovery Running ({activeRun.progress_percent ?? 15}% ·{' '}
-                {activeRun.profiles_found ?? 0} stored so far)
+                {activeRun.profiles_found ?? 0} evaluated ·{' '}
+                {activeRun.qualified_count ?? 0} qualified ·{' '}
+                {activeRun.needs_review_count ?? 0} needs review)
               </span>
             </div>
             <button
@@ -217,9 +244,11 @@ export const InfluencersPage: React.FC = () => {
         {viewMode === 'grid' ? (
           <CreatorGrid
             profiles={filteredProfiles}
+            totalStoredCount={totalStoredCount}
             selectedIds={selectedIds}
             onToggleSelect={toggleSelectId}
             onClearFilters={clearAllFilters}
+            onInspectProfile={(p) => setSelectedProfileIdForEnrich(p.id)}
           />
         ) : (
           <CreatorListView
@@ -227,6 +256,7 @@ export const InfluencersPage: React.FC = () => {
             selectedIds={selectedIds}
             onToggleSelect={toggleSelectId}
             onClearFilters={clearAllFilters}
+            onInspectProfile={(p) => setSelectedProfileIdForEnrich(p.id)}
           />
         )}
       </div>
@@ -284,16 +314,29 @@ export const InfluencersPage: React.FC = () => {
               <span className="inline-flex items-center gap-2 font-medium text-[#111827]">
                 <Info className="h-4 w-4 text-[#5B21B6] shrink-0" aria-hidden="true" />
                 <span>
-                  {isShowingDemoFallback
-                    ? 'Illustrative Demo Data — click Find Influencers to run live YouTube discovery'
-                    : 'Live YouTube Data API v3 Records — stored in shared Supabase workspace'}
+                  {isBackendConnected
+                    ? 'Live YouTube Data API v3 & Instagram (Apify) Records — stored in shared Supabase workspace'
+                    : totalStoredCount > 0
+                      ? 'Live Discovery API Results (Database persistence unconfigured — verify Supabase config)'
+                      : 'Supabase workspace database disconnected — live API discovery still runs directly'}
                 </span>
               </span>
-              <span className="text-[#6B7280]">
-                {isShowingDemoFallback
-                  ? 'Illustrative Demo Data — Instagram/TikTok Not Connected'
-                  : 'Instagram / TikTok: Not Connected'}
-              </span>
+              <div className="flex flex-wrap items-center gap-3 text-[#6B7280]">
+                <span>
+                  {activeCamp
+                    ? `Campaign: ${activeCamp.name} (${(activeCamp.min_followers ?? 5000).toLocaleString()}–${(activeCamp.max_followers ?? 100000).toLocaleString()} reach, >= ${activeCamp.min_engagement_rate ?? 2}% eng.)`
+                    : 'YouTube & Instagram (Apify) Active · TikTok: Not Connected'}
+                </span>
+                {isBackendConnected && activeCamp && (
+                  <button
+                    type="button"
+                    onClick={() => void reEvaluateCreators()}
+                    className="font-semibold text-[#5B21B6] hover:underline cursor-pointer"
+                  >
+                    Re-evaluate
+                  </button>
+                )}
+              </div>
             </div>
 
             {renderWorkspaceContent()}
@@ -308,6 +351,13 @@ export const InfluencersPage: React.FC = () => {
         isBackendConnected={isBackendConnected}
         onAddToCampaign={addSelectedToCampaign}
         onClose={() => setModalMode(null)}
+      />
+
+      <CreatorEnrichmentModal
+        profile={selectedProfileForEnrich}
+        onClose={() => setSelectedProfileIdForEnrich(null)}
+        onEnrich={enrichCreatorProfile}
+        onUpdateChannels={updateCreatorChannels}
       />
     </div>
   );

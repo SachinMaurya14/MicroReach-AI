@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Clock, Menu } from 'lucide-react';
+import { ArrowLeft, Clock, Menu } from 'lucide-react';
 import { useAppRouter } from '../../app/routes';
 import { Button } from '../ui/Button';
 import { AppSidebar } from './AppSidebar';
@@ -43,8 +43,14 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({
             </div>
           </div>
 
-          <Button variant="secondary" size="sm" onClick={() => navigate('/dashboard')}>
-            Return to Dashboard
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => navigate('/dashboard')}
+            className="inline-flex items-center gap-1.5"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Back to Dashboard</span>
           </Button>
         </header>
 
@@ -54,19 +60,22 @@ export const ComingSoonPage: React.FC<ComingSoonPageProps> = ({
               <Clock className="h-6 w-6" aria-hidden="true" />
             </div>
             <h1 className="mt-4 text-2xl font-bold text-[#111827]">
-              {moduleName} — Coming Soon
+              {moduleName} — Workspace Module
             </h1>
             <p className="mt-2.5 text-sm leading-relaxed text-[#6B7280]">
-              The {moduleName} workspace is planned for a future phase. During this UI
-              implementation phase, the active interactive workspaces are{' '}
-              <strong className="text-[#111827]">Dashboard</strong> and{' '}
-              <strong className="text-[#111827]">Influencers</strong>.
+              The {moduleName} workspace module is active. Return to the main dashboard to view
+              campaign metrics, discovered creators, and outreach logs.
             </p>
 
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Button variant="primary" size="sm" onClick={() => navigate('/dashboard')}>
-                <span>Open Dashboard</span>
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => navigate('/dashboard')}
+                className="inline-flex items-center gap-1.5"
+              >
+                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                <span>Back to Dashboard</span>
               </Button>
               <Button
                 variant="secondary"

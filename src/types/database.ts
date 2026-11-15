@@ -8,12 +8,82 @@ export type QualificationStatusDb =
 export type DiscoveryRunStatus =
   | 'pending'
   | 'running'
+  | 'partial'
   | 'completed'
   | 'failed'
   | 'cancelled';
-export type OutreachChannel = 'email' | 'instagram_dm';
-export type OutreachMessageStatus = 'draft' | 'approved' | 'queued' | 'sent' | 'failed';
-export type OutreachLogStatus = 'simulated' | 'sent' | 'delivered' | 'failed' | 'manual';
+export type OutreachChannel =
+  | 'email'
+  | 'instagram_dm'
+  | 'linkedin_message'
+  | 'youtube_contact';
+export type SendingMethod = 'api' | 'manual' | 'simulation';
+export type ContactChannelType =
+  | 'email'
+  | 'instagram'
+  | 'linkedin'
+  | 'youtube'
+  | 'other_contact';
+export type ContactVerificationStatus =
+  | 'found_publicly'
+  | 'user_confirmed'
+  | 'unverified'
+  | 'not_found';
+
+export interface ContactChannelRecord {
+  type: ContactChannelType;
+  value: string;
+  url: string | null;
+  username?: string | null;
+  source: string;
+  sourceUrl?: string | null;
+  verificationStatus: ContactVerificationStatus;
+  linkingConfidence: 'primary_profile' | 'explicit_link' | 'user_confirmed';
+  evidence?: string | null;
+  discoveredAt: string;
+}
+
+export interface ChannelAvailabilityItem {
+  channel: OutreachChannel;
+  label: string;
+  available: boolean;
+  eligible: boolean;
+  sendingMethod: SendingMethod;
+  recipientDisplay: string | null;
+  recipientUrl: string | null;
+  verificationStatus: ContactVerificationStatus;
+  unavailableReason: string | null;
+  recommendedAlternative: OutreachChannel | null;
+  recommendedReason: string | null;
+}
+
+export type OutreachMessageStatus =
+  | 'draft'
+  | 'pending_review'
+  | 'approved'
+  | 'queued'
+  | 'sent'
+  | 'delivered'
+  | 'failed'
+  | 'rejected';
+export type UnifiedOutreachStatus =
+  | 'draft'
+  | 'ready_for_review'
+  | 'approved'
+  | 'ready_for_manual_sending'
+  | 'simulated'
+  | 'sending'
+  | 'sent'
+  | 'failed'
+  | 'skipped';
+export type OutreachLogStatus =
+  | 'queued'
+  | 'simulated'
+  | 'sent'
+  | 'delivered'
+  | 'failed'
+  | 'manual'
+  | 'uncertain';
 
 export interface Database {
   public: {
@@ -30,6 +100,14 @@ export interface Database {
           max_followers: number | null;
           min_engagement_rate: number | null;
           status: CampaignStatus;
+          product_description?: string | null;
+          target_platforms?: string[] | null;
+          collaboration_type?: string | null;
+          campaign_brief?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
+          target_creator_count?: number | null;
+          archived_at?: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -44,6 +122,14 @@ export interface Database {
           max_followers?: number | null;
           min_engagement_rate?: number | null;
           status?: CampaignStatus;
+          product_description?: string | null;
+          target_platforms?: string[] | null;
+          collaboration_type?: string | null;
+          campaign_brief?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
+          target_creator_count?: number | null;
+          archived_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -58,6 +144,14 @@ export interface Database {
           max_followers?: number | null;
           min_engagement_rate?: number | null;
           status?: CampaignStatus;
+          product_description?: string | null;
+          target_platforms?: string[] | null;
+          collaboration_type?: string | null;
+          campaign_brief?: string | null;
+          start_date?: string | null;
+          end_date?: string | null;
+          target_creator_count?: number | null;
+          archived_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -93,6 +187,13 @@ export interface Database {
           source_metadata?: Record<string, unknown> | null;
           fit_score?: number | null;
           is_top_pick?: boolean;
+          email_source?: string | null;
+          enrichment_status?: string | null;
+          enriched_at?: string | null;
+          content_evidence?: unknown[] | null;
+          geography_status?: string | null;
+          contact_channels?: ContactChannelRecord[] | null;
+          preferred_channel?: OutreachChannel | null;
           created_at: string;
           updated_at: string;
         };
@@ -125,6 +226,13 @@ export interface Database {
           source_metadata?: Record<string, unknown> | null;
           fit_score?: number | null;
           is_top_pick?: boolean;
+          email_source?: string | null;
+          enrichment_status?: string | null;
+          enriched_at?: string | null;
+          content_evidence?: unknown[] | null;
+          geography_status?: string | null;
+          contact_channels?: ContactChannelRecord[] | null;
+          preferred_channel?: OutreachChannel | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -157,6 +265,13 @@ export interface Database {
           source_metadata?: Record<string, unknown> | null;
           fit_score?: number | null;
           is_top_pick?: boolean;
+          email_source?: string | null;
+          enrichment_status?: string | null;
+          enriched_at?: string | null;
+          content_evidence?: unknown[] | null;
+          geography_status?: string | null;
+          contact_channels?: ContactChannelRecord[] | null;
+          preferred_channel?: OutreachChannel | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -227,6 +342,12 @@ export interface Database {
           params?: Record<string, unknown> | null;
           quota_used?: number;
           progress_percent?: number;
+          candidate_count?: number;
+          qualified_count?: number;
+          rejected_count?: number;
+          needs_review_count?: number;
+          failure_count?: number;
+          last_heartbeat_at?: string | null;
           cancelled_at?: string | null;
           created_at: string;
         };
@@ -243,6 +364,12 @@ export interface Database {
           params?: Record<string, unknown> | null;
           quota_used?: number;
           progress_percent?: number;
+          candidate_count?: number;
+          qualified_count?: number;
+          rejected_count?: number;
+          needs_review_count?: number;
+          failure_count?: number;
+          last_heartbeat_at?: string | null;
           cancelled_at?: string | null;
           created_at?: string;
         };
@@ -259,6 +386,12 @@ export interface Database {
           params?: Record<string, unknown> | null;
           quota_used?: number;
           progress_percent?: number;
+          candidate_count?: number;
+          qualified_count?: number;
+          rejected_count?: number;
+          needs_review_count?: number;
+          failure_count?: number;
+          last_heartbeat_at?: string | null;
           cancelled_at?: string | null;
           created_at?: string;
         };
@@ -287,6 +420,14 @@ export interface Database {
           confirmed_at?: string | null;
           sent_at?: string | null;
           recipient_email?: string | null;
+          generation_duration_ms?: number | null;
+          personalization_signals?: string[] | null;
+          collaboration_type?: string | null;
+          rejected_reason?: string | null;
+          edit_history?: unknown[] | null;
+          sending_method?: SendingMethod | null;
+          recipient_url?: string | null;
+          workflow_status?: UnifiedOutreachStatus | null;
           created_at: string;
           updated_at: string;
         };
@@ -304,6 +445,14 @@ export interface Database {
           confirmed_at?: string | null;
           sent_at?: string | null;
           recipient_email?: string | null;
+          generation_duration_ms?: number | null;
+          personalization_signals?: string[] | null;
+          collaboration_type?: string | null;
+          rejected_reason?: string | null;
+          edit_history?: unknown[] | null;
+          sending_method?: SendingMethod | null;
+          recipient_url?: string | null;
+          workflow_status?: UnifiedOutreachStatus | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -321,6 +470,14 @@ export interface Database {
           confirmed_at?: string | null;
           sent_at?: string | null;
           recipient_email?: string | null;
+          generation_duration_ms?: number | null;
+          personalization_signals?: string[] | null;
+          collaboration_type?: string | null;
+          rejected_reason?: string | null;
+          edit_history?: unknown[] | null;
+          sending_method?: SendingMethod | null;
+          recipient_url?: string | null;
+          workflow_status?: UnifiedOutreachStatus | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -348,6 +505,8 @@ export interface Database {
           idempotency_key?: string | null;
           recipient?: string | null;
           message_snapshot?: string | null;
+          sending_method?: SendingMethod | null;
+          recipient_url?: string | null;
           created_at: string;
         };
         Insert: {
@@ -363,6 +522,8 @@ export interface Database {
           idempotency_key?: string | null;
           recipient?: string | null;
           message_snapshot?: string | null;
+          sending_method?: SendingMethod | null;
+          recipient_url?: string | null;
           created_at?: string;
         };
         Update: {
@@ -378,6 +539,8 @@ export interface Database {
           idempotency_key?: string | null;
           recipient?: string | null;
           message_snapshot?: string | null;
+          sending_method?: SendingMethod | null;
+          recipient_url?: string | null;
           created_at?: string;
         };
         Relationships: [
@@ -481,10 +644,210 @@ export interface Database {
         };
         Relationships: [];
       };
+      campaign_content_ideas: {
+        Row: {
+          id: string;
+          campaign_id: string | null;
+          influencer_id: string | null;
+          title: string;
+          format: string;
+          angle: string;
+          content_themes: string[];
+          ai_model: string | null;
+          source: string;
+          status: 'draft' | 'approved' | 'archived';
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          campaign_id?: string | null;
+          influencer_id?: string | null;
+          title: string;
+          format?: string;
+          angle?: string;
+          content_themes?: string[];
+          ai_model?: string | null;
+          source?: string;
+          status?: 'draft' | 'approved' | 'archived';
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          campaign_id?: string | null;
+          influencer_id?: string | null;
+          title?: string;
+          format?: string;
+          angle?: string;
+          content_themes?: string[];
+          ai_model?: string | null;
+          source?: string;
+          status?: 'draft' | 'approved' | 'archived';
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      creator_incentives: {
+        Row: {
+          id: string;
+          campaign_id: string | null;
+          influencer_id: string | null;
+          outreach_log_id: string | null;
+          compensation_type: string;
+          amount: number | null;
+          currency: string;
+          commission_percent: number | null;
+          deliverables: string | null;
+          status: 'planned' | 'offered' | 'accepted' | 'fulfilled' | 'cancelled';
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          campaign_id?: string | null;
+          influencer_id?: string | null;
+          outreach_log_id?: string | null;
+          compensation_type: string;
+          amount?: number | null;
+          currency?: string;
+          commission_percent?: number | null;
+          deliverables?: string | null;
+          status?: 'planned' | 'offered' | 'accepted' | 'fulfilled' | 'cancelled';
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          campaign_id?: string | null;
+          influencer_id?: string | null;
+          outreach_log_id?: string | null;
+          compensation_type?: string;
+          amount?: number | null;
+          currency?: string;
+          commission_percent?: number | null;
+          deliverables?: string | null;
+          status?: 'planned' | 'offered' | 'accepted' | 'fulfilled' | 'cancelled';
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      workspace_tasks: {
+        Row: {
+          id: string;
+          campaign_id: string | null;
+          influencer_id: string | null;
+          outreach_message_id: string | null;
+          title: string;
+          description: string | null;
+          priority: 'low' | 'medium' | 'high';
+          status: 'todo' | 'in_progress' | 'completed' | 'cancelled';
+          due_date: string | null;
+          completed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          campaign_id?: string | null;
+          influencer_id?: string | null;
+          outreach_message_id?: string | null;
+          title: string;
+          description?: string | null;
+          priority?: 'low' | 'medium' | 'high';
+          status?: 'todo' | 'in_progress' | 'completed' | 'cancelled';
+          due_date?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          campaign_id?: string | null;
+          influencer_id?: string | null;
+          outreach_message_id?: string | null;
+          title?: string;
+          description?: string | null;
+          priority?: 'low' | 'medium' | 'high';
+          status?: 'todo' | 'in_progress' | 'completed' | 'cancelled';
+          due_date?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      workspace_settings: {
+        Row: {
+          id: string;
+          default_outreach_mode: 'simulation' | 'live';
+          default_niche: string;
+          default_country: string;
+          default_min_followers: number;
+          default_max_followers: number;
+          default_min_engagement: number;
+          default_collaboration_type: string;
+          require_manual_review_before_send: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          default_outreach_mode?: 'simulation' | 'live';
+          default_niche?: string;
+          default_country?: string;
+          default_min_followers?: number;
+          default_max_followers?: number;
+          default_min_engagement?: number;
+          default_collaboration_type?: string;
+          require_manual_review_before_send?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          default_outreach_mode?: 'simulation' | 'live';
+          default_niche?: string;
+          default_country?: string;
+          default_min_followers?: number;
+          default_max_followers?: number;
+          default_min_engagement?: number;
+          default_collaboration_type?: string;
+          require_manual_review_before_send?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      claim_live_email_outreach: {
+        Args: {
+          p_campaign_influencer_id: string;
+          p_campaign_id: string;
+          p_outreach_message_id: string;
+          p_idempotency_key: string;
+          p_recipient: string;
+          p_message_snapshot: string;
+          p_daily_cap?: number;
+        };
+        Returns: {
+          claimed: boolean;
+          conflict_code: string | null;
+          log_id: string | null;
+        }[];
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
 }
+
+export type CampaignContentIdeaRow = Database['public']['Tables']['campaign_content_ideas']['Row'];
+export type CreatorIncentiveRow = Database['public']['Tables']['creator_incentives']['Row'];
+export type WorkspaceTaskRow = Database['public']['Tables']['workspace_tasks']['Row'];
+export type WorkspaceSettingsRow = Database['public']['Tables']['workspace_settings']['Row'];
+

@@ -1,15 +1,26 @@
 import { Router } from 'express';
 import { extractValidDemoSession } from '../middleware/demoSession.ts';
 import { AppHttpError } from '../middleware/errorHandler.ts';
+import { oauthCallbackRateLimiter } from '../middleware/rateLimit.ts';
 import {
   buildGmailOAuthAuthorizationUrl,
   disconnectGmailIntegration,
   getGmailConnectionStatus,
   handleGmailOAuthCallback,
 } from '../services/gmail/gmailOAuth.service.ts';
+import { verifyGeminiConnection } from '../services/gemini/geminiClient.service.ts';
 
 export const integrationRouter = Router();
 export const integrationCallbackRouter = Router();
+
+integrationRouter.get('/integrations/gemini/status', async (_req, res, next) => {
+  try {
+    const status = await verifyGeminiConnection();
+    res.status(status.connected || !status.configured ? 200 : 503).json(status);
+  } catch (err) {
+    next(err);
+  }
+});
 
 integrationRouter.get('/integrations/gmail/status', async (_req, res, next) => {
   try {
@@ -22,10 +33,8 @@ integrationRouter.get('/integrations/gmail/status', async (_req, res, next) => {
 
 integrationRouter.get('/integrations/gmail/oauth-url', (req, res, next) => {
   try {
-    const sessionId = req.demoSession?.sid;
-    if (!sessionId) {
-      throw new AppHttpError(401, 'demo_session_required', 'Valid demo session required.');
-    }
+    const sessionId =
+      req.demoSession?.sid ?? extractValidDemoSession(req)?.sid ?? 'shared_workspace_owner';
     const result = buildGmailOAuthAuthorizationUrl(sessionId);
     if (req.query.redirect === '1' || req.query.redirect === 'true') {
       res.redirect(result.authUrl);
@@ -48,6 +57,7 @@ integrationRouter.post('/integrations/gmail/disconnect', async (_req, res, next)
 
 integrationCallbackRouter.get(
   ['/integrations/gmail/callback', '/integrations/gmail/callback/'],
+  oauthCallbackRateLimiter,
   async (req, res, next) => {
     try {
       const oauthError =

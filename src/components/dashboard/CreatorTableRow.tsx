@@ -165,23 +165,48 @@ export const CreatorTableRow: React.FC<CreatorTableRowProps> = ({
 
       {/* Email / Contact */}
       <td className="py-3.5 px-3 align-middle">
-        {creator.email === 'Not Found' ? (
-          <span className="text-xs font-medium text-[#9CA3AF]">[Not Found]</span>
-        ) : (
-          <div>
-            <div className="text-xs font-medium text-[#111827] whitespace-nowrap">
-              {creator.email}
-            </div>
-            {creator.emailVerifiedDemo && (
-              <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[#D1FAE5] px-2 py-0.5 text-[10.5px] font-semibold text-[#059669]">
-                <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
-                <span>
-                  {creator.isLiveRecord ? 'public business email' : 'verified email (demo)'}
+        <div>
+          {creator.email === 'Not Found' ? (
+            <span className="text-xs font-medium text-[#9CA3AF]">[Not Found]</span>
+          ) : (
+            <div>
+              <div className="text-xs font-medium text-[#111827] whitespace-nowrap">
+                {creator.email}
+              </div>
+              {creator.emailStatus === 'verified' || creator.emailVerifiedDemo ? (
+                <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[#D1FAE5] px-2 py-0.5 text-[10.5px] font-semibold text-[#059669]">
+                  <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
+                  <span>Manually verified</span>
                 </span>
-              </span>
-            )}
-          </div>
-        )}
+              ) : (
+                <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-[#FEF3C7] px-2 py-0.5 text-[10.5px] font-semibold text-[#92400E]">
+                  <Clock className="h-3 w-3" aria-hidden="true" />
+                  <span>Publicly listed (unverified)</span>
+                </span>
+              )}
+            </div>
+          )}
+          {creator.contactChannels && creator.contactChannels.length > 0 && (
+            <div className="mt-1 text-[10px] font-medium text-[#5B21B6]">
+              Channels:{' '}
+              {Array.from(
+                new Set(
+                  creator.contactChannels.map((ch) =>
+                    ch.type === 'instagram'
+                      ? 'IG'
+                      : ch.type === 'linkedin'
+                        ? 'LinkedIn'
+                        : ch.type === 'youtube'
+                          ? 'YouTube'
+                          : ch.type === 'email'
+                            ? 'Email'
+                            : 'Link'
+                  )
+                )
+              ).join(' · ')}
+            </div>
+          )}
+        </div>
       </td>
 
       {/* Actions */}

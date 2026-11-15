@@ -9,7 +9,7 @@ import {
   Settings,
   X,
 } from 'lucide-react';
-import { InfluencerSortOption, InfluencerViewMode } from '../../types/influencer';
+import { InfluencerQualFilter, InfluencerSortOption, InfluencerViewMode } from '../../types/influencer';
 
 interface InfluencerSearchToolbarProps {
   searchQuery: string;
@@ -20,6 +20,8 @@ interface InfluencerSearchToolbarProps {
   selectedCount: number;
   sortBy: InfluencerSortOption;
   onSortChange: (value: InfluencerSortOption) => void;
+  qualFilter: InfluencerQualFilter;
+  onQualFilterChange: (value: InfluencerQualFilter) => void;
   viewMode: InfluencerViewMode;
   onViewModeChange: (mode: InfluencerViewMode) => void;
   onOpenAddToList: () => void;
@@ -35,6 +37,8 @@ export const InfluencerSearchToolbar: React.FC<InfluencerSearchToolbarProps> = (
   selectedCount,
   sortBy,
   onSortChange,
+  qualFilter,
+  onQualFilterChange,
   viewMode,
   onViewModeChange,
   onOpenAddToList,
@@ -48,63 +52,63 @@ export const InfluencerSearchToolbar: React.FC<InfluencerSearchToolbarProps> = (
       <div className="flex items-center gap-2">
         <div className="relative flex-1 flex items-center h-10 rounded-lg border border-[#E5E7EB] bg-white px-3 focus-within:border-[#5B21B6]">
           <Search className="h-4 w-4 text-[#9CA3AF] shrink-0" aria-hidden="true" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search"
-            aria-label="Search demo creators"
-            className="flex-1 bg-transparent px-2.5 text-[13.5px] text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none"
-          />
-          <div className="flex items-center gap-1.5 shrink-0">
-            <button
-              type="button"
-              onClick={() =>
-                setUtilityNote('Voice search is not enabled in this frontend preview.')
-              }
-              title="Voice search (coming soon)"
-              aria-label="Voice search (coming soon)"
-              className="rounded p-1 text-[#6B7280] hover:bg-[#F3F4F6] cursor-pointer"
-            >
-              <Mic className="h-3.5 w-3.5" />
-            </button>
-
-            {searchQuery && (
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder="Search creators by name, niche, or keyword"
+              aria-label="Search creators"
+              className="flex-1 bg-transparent px-2.5 text-[13.5px] text-[#111827] placeholder:text-[#9CA3AF] focus:outline-none"
+            />
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
-                onClick={() => onSearchChange('')}
-                title="Clear search"
-                aria-label="Clear search"
+                onClick={() =>
+                  setUtilityNote('Voice search is not enabled in this browser workspace.')
+                }
+                title="Voice search (unavailable)"
+                aria-label="Voice search (unavailable)"
                 className="rounded p-1 text-[#6B7280] hover:bg-[#F3F4F6] cursor-pointer"
               >
-                <X className="h-3.5 w-3.5" />
+                <Mic className="h-3.5 w-3.5" />
               </button>
-            )}
 
-            <button
-              type="button"
-              onClick={() =>
-                setUtilityNote('Search preferences will unlock with live API integration.')
-              }
-              title="Search settings"
-              aria-label="Search settings"
-              className="rounded p-1 text-[#6B7280] hover:bg-[#F3F4F6] cursor-pointer"
-            >
-              <Settings className="h-3.5 w-3.5" />
-            </button>
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => onSearchChange('')}
+                  title="Clear search"
+                  aria-label="Clear search"
+                  className="rounded p-1 text-[#6B7280] hover:bg-[#F3F4F6] cursor-pointer"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() =>
+                  setUtilityNote('Use the left Discovery Filters panel to refine YouTube creator criteria.')
+                }
+                title="Search settings"
+                aria-label="Search settings"
+                className="rounded p-1 text-[#6B7280] hover:bg-[#F3F4F6] cursor-pointer"
+              >
+                <Settings className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
-        </div>
 
-        <button
-          type="button"
-          onClick={() =>
-            setUtilityNote('Showing illustrative GlowCare demo creators.')
-          }
-          aria-label="More search options"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white text-[#4B5563] hover:bg-[#F9FAFB] cursor-pointer shrink-0"
-        >
-          <MoreHorizontal className="h-4 w-4" />
-        </button>
+          <button
+            type="button"
+            onClick={() =>
+              setUtilityNote('Showing YouTube Data API v3 records stored in Supabase PostgreSQL.')
+            }
+            aria-label="More search options"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white text-[#4B5563] hover:bg-[#F9FAFB] cursor-pointer shrink-0"
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
       </div>
 
       {utilityNote && (
@@ -131,7 +135,7 @@ export const InfluencerSearchToolbar: React.FC<InfluencerSearchToolbarProps> = (
               onChange={onToggleSelectAll}
               className="h-4 w-4 rounded border-[#D1D5DB] text-[#5B21B6] cursor-pointer"
             />
-            <span className="mr-tabular">{resultCount} demo profiles</span>
+            <span className="mr-tabular">{resultCount} stored profiles</span>
           </label>
 
           <div className="flex items-center gap-1.5 text-xs text-[#4B5563]">
@@ -146,6 +150,21 @@ export const InfluencerSearchToolbar: React.FC<InfluencerSearchToolbarProps> = (
               <option value="followers-desc">Followers: High to Low</option>
               <option value="followers-asc">Followers: Low to High</option>
               <option value="engagement-desc">Engagement: High to Low</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-xs text-[#4B5563]">
+            <span>Status</span>
+            <select
+              aria-label="Filter by qualification status"
+              value={qualFilter}
+              onChange={(e) => onQualFilterChange(e.target.value as InfluencerQualFilter)}
+              className="rounded-lg border border-[#E5E7EB] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#111827] cursor-pointer"
+            >
+              <option value="all">All Statuses</option>
+              <option value="qualified">Qualified</option>
+              <option value="needs_review">Needs Review</option>
+              <option value="rejected">Rejected</option>
             </select>
           </div>
         </div>

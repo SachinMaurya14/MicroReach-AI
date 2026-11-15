@@ -1,13 +1,7 @@
 import express from 'express';
-import {
-  requireDemoSession,
-  validateSameOrigin,
-} from './middleware/demoSession.ts';
+import { validateSameOrigin } from './middleware/demoSession.ts';
 import { errorHandler } from './middleware/errorHandler.ts';
-import {
-  apiSessionRateLimiter,
-  oauthCallbackRateLimiter,
-} from './middleware/rateLimit.ts';
+import { apiSessionRateLimiter } from './middleware/rateLimit.ts';
 import { campaignRouter } from './routes/campaign.routes.ts';
 import { demoRouter } from './routes/demo.routes.ts';
 import { discoveryRouter } from './routes/discovery.routes.ts';
@@ -19,6 +13,7 @@ import {
 } from './routes/integration.routes.ts';
 import { messageRouter } from './routes/message.routes.ts';
 import { outreachRouter } from './routes/outreach.routes.ts';
+import { workspaceRouter } from './routes/workspace.routes.ts';
 
 export function createApp() {
   const app = express();
@@ -38,16 +33,17 @@ export function createApp() {
   // Public health, invitation-access, and HMAC-state-verified OAuth callback endpoints
   app.use('/api', healthRouter);
   app.use('/api', demoRouter);
-  app.use('/api', oauthCallbackRateLimiter, integrationCallbackRouter);
+  app.use('/api', integrationCallbackRouter);
 
-  // Protected workspace APIs: strict origin check + signed demo session + rate limit
-  app.use('/api', validateSameOrigin, requireDemoSession, apiSessionRateLimiter);
+  // Workspace APIs: same-origin protection + rate limit (direct access without invitation gate)
+  app.use('/api', validateSameOrigin, apiSessionRateLimiter);
   app.use('/api', campaignRouter);
   app.use('/api', influencerRouter);
   app.use('/api', discoveryRouter);
   app.use('/api', messageRouter);
   app.use('/api', outreachRouter);
   app.use('/api', integrationRouter);
+  app.use('/api', workspaceRouter);
 
   // Unmatched API endpoints return 404 JSON
   app.use('/api', (_req, res) => {

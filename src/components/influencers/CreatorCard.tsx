@@ -8,20 +8,22 @@ interface CreatorCardProps {
   profile: InfluencerDemoProfile;
   selected: boolean;
   onToggleSelect: (id: string) => void;
+  onInspectProfile?: (profile: InfluencerDemoProfile) => void;
 }
 
 export const CreatorCard: React.FC<CreatorCardProps> = ({
   profile,
   selected,
   onToggleSelect,
+  onInspectProfile,
 }) => {
   const qualBadge =
     profile.qualificationStatus === 'qualified'
-      ? { label: 'Qualified', cls: 'bg-[#D1FAE5] text-[#059669]' }
+      ? { label: 'Qualified (PASS)', cls: 'bg-[#D1FAE5] text-[#059669]' }
       : profile.qualificationStatus === 'needs_review'
         ? { label: 'Needs Review', cls: 'bg-[#FEF3C7] text-[#92400E]' }
         : profile.qualificationStatus === 'rejected'
-          ? { label: 'Rejected', cls: 'bg-[#FEE2E2] text-[#DC2626]' }
+          ? { label: 'Rejected (FAIL)', cls: 'bg-[#FEE2E2] text-[#DC2626]' }
           : null;
 
   return (
@@ -74,7 +76,7 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({
             href={profile.profileUrl}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`Open ${profile.name} YouTube channel`}
+            aria-label={`Open ${profile.name} profile`}
             className="text-[#6B7280] hover:text-[#5B21B6] shrink-0"
           >
             <ExternalLink className="h-3 w-3" />
@@ -111,6 +113,51 @@ export const CreatorCard: React.FC<CreatorCardProps> = ({
         platforms={profile.platforms}
         isLiveRecord={profile.isLiveRecord}
       />
+
+      {onInspectProfile && (
+        <div className="mt-2.5 pt-2 w-full border-t border-[#F3F4F6] flex items-center justify-between gap-2 text-[10.5px]">
+          <span
+            className={`truncate ${
+              profile.contactEmail ? 'font-medium text-[#059669]' : 'text-[#6B7280]'
+            }`}
+            title={
+              (profile.contactChannels ?? []).map((c) => `${c.type}: ${c.value}`).join(', ') ||
+              profile.contactEmail ||
+              'Email Not Found'
+            }
+          >
+            {profile.contactEmail ? 'Email' : 'No Email'}
+            {profile.contactChannels && profile.contactChannels.length > 0
+              ? ` · ${Array.from(
+                  new Set(
+                    profile.contactChannels.map((c) =>
+                      c.type === 'instagram'
+                        ? 'IG'
+                        : c.type === 'linkedin'
+                          ? 'LI'
+                          : c.type === 'youtube'
+                            ? 'YT'
+                            : c.type === 'email'
+                              ? 'Mail'
+                              : 'Web'
+                    )
+                  )
+                ).join('/')}`
+              : ''}
+          </span>
+          <button
+            type="button"
+            onClick={() => onInspectProfile(profile)}
+            className="font-semibold text-[#5B21B6] hover:underline cursor-pointer shrink-0"
+          >
+            {typeof profile.fitScore === 'number'
+              ? `Fit ${Math.round(profile.fitScore)} · Details`
+              : profile.enrichmentStatus === 'enriched'
+                ? 'Details / Re-enrich'
+                : 'Enrich / Details'}
+          </button>
+        </div>
+      )}
     </article>
   );
 };

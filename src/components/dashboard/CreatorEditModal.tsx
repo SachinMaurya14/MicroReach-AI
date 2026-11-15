@@ -16,6 +16,7 @@ export const CreatorEditModal: React.FC<CreatorEditModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [emailStatus, setEmailStatus] = useState<'verified' | 'unverified' | 'not_found'>('not_found');
   const [qualStatus, setQualStatus] = useState<DashboardQualStatus>('Passed');
   const [qualReason, setQualReason] = useState('');
 
@@ -23,6 +24,11 @@ export const CreatorEditModal: React.FC<CreatorEditModalProps> = ({
     if (!creator) return;
     setName(creator.name);
     setEmail(creator.email);
+    setEmailStatus(
+      creator.email === 'Not Found'
+        ? 'not_found'
+        : creator.emailStatus || (creator.emailVerifiedDemo ? 'verified' : 'unverified')
+    );
     setQualStatus(creator.qualStatus);
     setQualReason(creator.qualReason);
   }, [creator]);
@@ -32,11 +38,19 @@ export const CreatorEditModal: React.FC<CreatorEditModalProps> = ({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const cleanedEmail = email.trim() || 'Not Found';
+    const nextEmailStatus: 'verified' | 'unverified' | 'not_found' =
+      cleanedEmail.toLowerCase() === 'not found'
+        ? 'not_found'
+        : emailStatus === 'not_found'
+          ? 'unverified'
+          : emailStatus;
+
     onSave({
       ...creator,
       name: name.trim() || creator.name,
-      email: cleanedEmail,
-      emailVerifiedDemo: cleanedEmail !== 'Not Found',
+      email: nextEmailStatus === 'not_found' ? 'Not Found' : cleanedEmail,
+      emailStatus: nextEmailStatus,
+      emailVerifiedDemo: nextEmailStatus === 'verified',
       qualStatus,
       qualReason: qualReason.trim() || creator.qualReason,
     });
@@ -47,16 +61,8 @@ export const CreatorEditModal: React.FC<CreatorEditModalProps> = ({
     <Modal
       isOpen={Boolean(creator)}
       onClose={onClose}
-      title={
-        creator.isLiveRecord
-          ? `Manual Review: ${creator.name}`
-          : `Edit Demo Row: ${creator.name}`
-      }
-      subtitle={
-        creator.isLiveRecord
-          ? 'Updates manual review status and verified contact email in Supabase.'
-          : 'Local UI demo edit only — changes do not persist across page refreshes.'
-      }
+      title={`Manual Review: ${creator.name}`}
+      subtitle="Updates manual review status, verification state, and contact email in Supabase."
       maxWidthClass="max-w-md"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -79,9 +85,34 @@ export const CreatorEditModal: React.FC<CreatorEditModalProps> = ({
           <input
             type="text"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setEmail(val);
+              if (!val.trim() || val.trim().toLowerCase() === 'not found') {
+                setEmailStatus('not_found');
+              } else if (emailStatus === 'not_found') {
+                setEmailStatus('unverified');
+              }
+            }}
             className="h-[38px] w-full rounded-lg border border-[#D1D5DB] px-3 text-sm text-[#111827]"
           />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-[#111827] mb-1">
+            Email Verification Status
+          </label>
+          <select
+            value={emailStatus}
+            onChange={(e) =>
+              setEmailStatus(e.target.value as 'verified' | 'unverified' | 'not_found')
+            }
+            className="h-[38px] w-full rounded-lg border border-[#D1D5DB] bg-white px-3 text-sm text-[#111827]"
+          >
+            <option value="unverified">Publicly listed (unverified)</option>
+            <option value="verified">Manually verified (ready for Gmail)</option>
+            <option value="not_found">Not Found</option>
+          </select>
         </div>
 
         <div>
@@ -117,7 +148,7 @@ export const CreatorEditModal: React.FC<CreatorEditModalProps> = ({
             Cancel
           </Button>
           <Button type="submit" variant="primary" size="sm">
-            {creator.isLiveRecord ? 'Save Review' : 'Apply Local Edit'}
+            Save Review
           </Button>
         </div>
       </form>

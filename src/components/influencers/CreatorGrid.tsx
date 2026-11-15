@@ -4,33 +4,43 @@ import { CreatorCard } from './CreatorCard';
 
 interface CreatorGridProps {
   profiles: InfluencerDemoProfile[];
+  totalStoredCount?: number;
   selectedIds: string[];
   onToggleSelect: (id: string) => void;
   onClearFilters: () => void;
+  onInspectProfile?: (profile: InfluencerDemoProfile) => void;
 }
 
 export const CreatorGrid: React.FC<CreatorGridProps> = ({
   profiles,
+  totalStoredCount = 0,
   selectedIds,
   onToggleSelect,
   onClearFilters,
+  onInspectProfile,
 }) => {
   if (profiles.length === 0) {
     return (
       <div className="mr-influencers-card p-10 text-center">
         <p className="text-base font-semibold text-[#111827]">
-          No illustrative demo creators match these filters
+          {totalStoredCount === 0
+            ? 'No stored YouTube creators found yet'
+            : 'No creators match these filters'}
         </p>
         <p className="mt-1.5 text-sm text-[#6B7280]">
-          Adjust your local filters or clear filters to view all sample profiles.
+          {totalStoredCount === 0
+            ? 'Click Find Influencers in the left filter panel to discover real YouTube Beauty & Skincare creators.'
+            : 'Adjust or clear your filters to view stored profiles.'}
         </p>
-        <button
-          type="button"
-          onClick={onClearFilters}
-          className="mt-4 inline-flex items-center rounded-full bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#6D28D9] cursor-pointer"
-        >
-          Clear Filters
-        </button>
+        {totalStoredCount > 0 && (
+          <button
+            type="button"
+            onClick={onClearFilters}
+            className="mt-4 inline-flex items-center rounded-full bg-[#5B21B6] px-4 py-2 text-xs font-semibold text-white hover:bg-[#6D28D9] cursor-pointer"
+          >
+            Clear Filters
+          </button>
+        )}
       </div>
     );
   }
@@ -43,6 +53,7 @@ export const CreatorGrid: React.FC<CreatorGridProps> = ({
           profile={profile}
           selected={selectedIds.includes(profile.id)}
           onToggleSelect={onToggleSelect}
+          onInspectProfile={onInspectProfile}
         />
       ))}
     </div>
